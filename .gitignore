@@ -1,0 +1,12 @@
+# 忽略所有文件
+/*
+
+!.gitignore
+
+# 允许跟踪的文件夹
+!/qml
+!/src
+!/res
+
+# 允许跟踪的文件
+!/CMakeLists.txt
