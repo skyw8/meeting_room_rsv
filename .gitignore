@@ -10,3 +10,4 @@
 
 # 允许跟踪的文件
 !/CMakeLists.txt
+!/README.md
