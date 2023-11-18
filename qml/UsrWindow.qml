@@ -21,7 +21,7 @@ FluWindow {
     launchMode: FluWindowType.SingleTask
     appBar: undefined
     Component.onCompleted:{
-        console.log("usrname: ",argument.UsrInfo.UserName)
+        console.log("usrname: ",argument.UsrInfo.UserID)
     }
     SettingsViewModel{
         id:viewmodel_settings

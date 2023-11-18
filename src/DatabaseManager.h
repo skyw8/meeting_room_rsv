@@ -29,6 +29,8 @@ public:
     Q_INVOKABLE QList<QVariantMap> searchRooms(const QString &searchText);
     Q_INVOKABLE QString getReservationDate(const QString &reservationID);
     Q_INVOKABLE QList<QVariantMap> getApprovedReservationsData(const QString &status);
+    Q_INVOKABLE QList<QVariantMap> getApprovedReservationsDataUsers(const QString &status, const QString &userID);
+    Q_INVOKABLE bool cancelReservation(const QString &reservationID);
 
 private:
     QSqlDatabase db;
