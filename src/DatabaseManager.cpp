@@ -234,3 +234,32 @@ QString DatabaseManager::getReservationDate(const QString &reservationID)
 
     return QString();
 }
+
+QList<QVariantMap> DatabaseManager::getApprovedReservationsData(const QString &status)
+{
+    QList<QVariantMap> dataList;
+
+    // 执行查询
+    QSqlQuery query(db);
+    QString queryString = QString("SELECT * FROM Reservations WHERE ReservationStatus = :status");
+    query.prepare(queryString);
+    query.bindValue(":status", status);
+
+    if (query.exec()) {
+        QSqlRecord record = query.record();
+        
+        while (query.next()) {
+            QVariantMap rowData;
+            for (int i = 0; i < record.count(); ++i) {
+                QString fieldName = record.fieldName(i);
+                QVariant value = query.value(i);
+                rowData.insert(fieldName, value);
+            }
+            dataList.append(rowData);
+        }
+    } else {
+        qDebug() << "Query failed:" << query.lastError().text();
+    }
+
+    return dataList;
+}

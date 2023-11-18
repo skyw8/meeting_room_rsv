@@ -1,7 +1,7 @@
 **Database meeting_room_rsv** 
 
 
-
+```sql
 CREATE TABLE Users (
     UserID numeric(25) PRIMARY KEY,
     UserName VARCHAR(255) UNIQUE,
@@ -53,3 +53,4 @@ CREATE TABLE ApprovalLogs (
     FOREIGN KEY (ReservationID) REFERENCES Reservations(ReservationID),
     FOREIGN KEY (ApproverID) REFERENCES Users(UserID)
 );
+```

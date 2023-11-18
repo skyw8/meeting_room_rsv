@@ -36,7 +36,7 @@ FluWindow{
         id: delayTimer
         interval: 500
         onTriggered: {
-            FluApp.navigate("/admin",{UserName:accountInput.text.toString()});
+            FluApp.navigate("/usr",{UserName:accountInput.text.toString()});
             login.close();
             
         }

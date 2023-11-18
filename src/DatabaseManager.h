@@ -28,6 +28,7 @@ public:
     Q_INVOKABLE bool updateRoom(const QString &roomID, const QString &roomName, int capacity, double roomArea, const QString &description, const QString &photoPath);
     Q_INVOKABLE QList<QVariantMap> searchRooms(const QString &searchText);
     Q_INVOKABLE QString getReservationDate(const QString &reservationID);
+    Q_INVOKABLE QList<QVariantMap> getApprovedReservationsData(const QString &status);
 
 private:
     QSqlDatabase db;
