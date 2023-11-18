@@ -11,6 +11,7 @@ FluContentPage {
     Component.onCompleted: {
         load_data();
     }
+    
     property var roomAddPageRegister: registerForWindowResult("/room_add")
     Connections {
         target: roomAddPageRegister

@@ -271,3 +271,47 @@ QList<QVariantMap> DatabaseManager::getApprovedReservationsData(const QString &s
 
     return dataList;
 }
+
+
+QList<QVariantMap> DatabaseManager::getApprovedReservationsDataUsers(const QString &status, const QString &userID) {
+    QList<QVariantMap> dataList;
+
+    // 执行查询
+    QSqlQuery query(db);
+    QString queryString = QString("SELECT * FROM Reservations WHERE ReservationStatus = :status AND UserID = :userID");
+    query.prepare(queryString);
+    query.bindValue(":status", status);
+    query.bindValue(":userID", userID);  // 绑定 UserID
+
+    if (query.exec()) {
+        QSqlRecord record = query.record();
+        
+        while (query.next()) {
+            QVariantMap rowData;
+            for (int i = 0; i < record.count(); ++i) {
+                QString fieldName = record.fieldName(i);
+                QVariant value = query.value(i);
+                rowData.insert(fieldName, value);
+            }
+            dataList.append(rowData);
+        }
+    } else {
+        qDebug() << "Query failed:" << query.lastError().text();
+    }
+
+    return dataList;
+}
+
+
+bool DatabaseManager::cancelReservation(const QString &reservationID) {
+    QSqlQuery query(db);
+    query.prepare("UPDATE Reservations SET ReservationStatus = 'canceled' WHERE ReservationID = :reservationID");
+    query.bindValue(":reservationID", reservationID);
+
+    if (!query.exec()) {
+        qDebug() << "Update failed:" << query.lastError().text();
+        return false;
+    }
+
+    return true;
+}

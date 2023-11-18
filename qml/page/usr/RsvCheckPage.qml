@@ -5,16 +5,56 @@ import QtQuick.Window
 import FluentUI
 import meeting_room_rsv
 
-
-
 FluContentPage {
     id: rsvCheck_page
     title: "预约记录"
-
+    property var activeTableView // 新增属性，用于存储当前激活的 FluTableView
     property int currentRowIndex: -1
     Component.onCompleted: {
-        load_data();
+        load_data_agree();
     }
+    Component {
+        id: operation_cancel
+        Item {
+            RowLayout {
+                anchors.centerIn: parent
+                FluButton {
+                    id: btn_detail
+                    text: "详情"
+                    onClicked: {
+                        //var obj = activeTableView.dataSource[rsvCheck_page.currentRowIndex];
+                        currentRowIndex = row;
+                        var obj = activeTableView.dataSource[currentRowIndex];
+                        console.log("传递的数据：", JSON.stringify(obj));
+                        console.log("查看详情", obj.ReservationID);
+                        FluApp.navigate("/rsv_detail", {
+                                rsvData: obj
+                            });
+                    }
+                }
+                FluFilledButton {
+                    id: btn_cancel
+                    text: "取消预约"
+                    onClicked: {
+                        currentRowIndex = row;
+                        var obj = activeTableView.dataSource[currentRowIndex];
+                        var success = db_mng.cancelReservation(obj.ReservationID);
+                        if (success) {
+                            showSuccess("取消成功");
+                            load_data_agree();
+                            load_data_unapproved()
+                        } else {
+                            showError("取消失败");
+                        }
+                    }
+                }
+            }
+        }
+
+    
+
+    }
+
     Component {
         id: operation
         Item {
@@ -24,8 +64,9 @@ FluContentPage {
                     id: btn_detail
                     text: "详情"
                     onClicked: {
+                        //var obj = activeTableView.dataSource[rsvCheck_page.currentRowIndex];
                         currentRowIndex = row;
-                        var obj = tbl_view.dataSource[currentRowIndex];
+                        var obj = activeTableView.dataSource[currentRowIndex];
                         console.log("传递的数据：", JSON.stringify(obj));
                         console.log("查看详情", obj.ReservationID);
                         FluApp.navigate("/rsv_detail", {
@@ -37,26 +78,68 @@ FluContentPage {
         }
     }
 
+    Component {
+        id: edit_box
+        Item {
+        }
+    }
+
     FluComboBox {
-        id : rsvCheck_CB
+        id: rsvCheck_CB
         model: ListModel {
             id: model_1
             ListElement {
-                text: "agree"
+                text: "通过"
             }
             ListElement {
-                text: "Apple"
+                text: "驳回"
             }
             ListElement {
-                text: "Coconut"
+                text: "未审批"
             }
+            ListElement {
+                text: "已取消"
+            }
+        }
+        onCurrentIndexChanged: {
+            Qt.callLater(function () {
+                    if (rsvCheck_CB.currentText === "通过") {
+                        activeTableView = tbl_view_agree;
+                        tbl_view_agree.visible = true;
+                        tbl_view_reject.visible = false;
+                        tbl_view_unapproved.visible = false;
+                        tbl_view_canceled.visible = false;
+                        load_data_agree();
+                    } else if (rsvCheck_CB.currentText === "驳回") {
+                        activeTableView = tbl_view_reject;
+                        tbl_view_agree.visible = false;
+                        tbl_view_reject.visible = true;
+                        tbl_view_unapproved.visible = false;
+                        tbl_view_canceled.visible = false;
+                        load_data_reject();
+                    } else if (rsvCheck_CB.currentText === "未审批") {
+                        activeTableView = tbl_view_unapproved;
+                        tbl_view_agree.visible = false;
+                        tbl_view_reject.visible = false;
+                        tbl_view_unapproved.visible = true;
+                        tbl_view_canceled.visible = false;
+                        load_data_unapproved();
+                    } else if (rsvCheck_CB.currentText === "已取消") {
+                        activeTableView = tbl_view_canceled;
+                        tbl_view_agree.visible = false;
+                        tbl_view_reject.visible = false;
+                        tbl_view_unapproved.visible = false;
+                        tbl_view_canceled.visible = true;
+                        load_data_canceled();
+                    }
+                });
         }
     }
 
     FluTableView {
         id: tbl_view_agree
         dataSource: []
-        visible : true
+        visible: true
         anchors {
             top: rsvCheck_CB.bottom
             left: parent.left
@@ -95,19 +178,12 @@ FluContentPage {
                 maximumWidth: 120,
                 editDelegate: edit_box
             }, {
-                title: "test",
-                dataIndex: 'ReservationStatus',
-                width: 80,
-                minimumWidth: 120,
-                maximumWidth: 120,
-                editDelegate: edit_box
-            }, {
                 title: "操作",
-                dataIndex: 'operation',
+                dataIndex: 'operation_cancel',
                 width: 160,
                 minimumWidth: 160,
                 maximumWidth: 160,
-                delegate: operation,
+                delegate: operation_cancel,
                 editDelegate: edit_box
             }]
         Component.onCompleted: {
@@ -117,7 +193,7 @@ FluContentPage {
     FluTableView {
         id: tbl_view_reject
         dataSource: []
-        visible : false
+        visible: false
         anchors {
             top: rsvCheck_CB.bottom
             left: parent.left
@@ -151,13 +227,6 @@ FluContentPage {
             }, {
                 title: "参会人数",
                 dataIndex: 'Attendance',
-                width: 80,
-                minimumWidth: 120,
-                maximumWidth: 120,
-                editDelegate: edit_box
-            }, {
-                title: "test",
-                dataIndex: 'ReservationStatus',
                 width: 80,
                 minimumWidth: 120,
                 maximumWidth: 120,
@@ -178,7 +247,7 @@ FluContentPage {
     FluTableView {
         id: tbl_view_unapproved
         dataSource: []
-        visible : false
+        visible: false
         anchors {
             top: rsvCheck_CB.bottom
             left: parent.left
@@ -217,19 +286,12 @@ FluContentPage {
                 maximumWidth: 120,
                 editDelegate: edit_box
             }, {
-                title: "test",
-                dataIndex: 'ReservationStatus',
-                width: 80,
-                minimumWidth: 120,
-                maximumWidth: 120,
-                editDelegate: edit_box
-            }, {
                 title: "操作",
-                dataIndex: 'operation',
+                dataIndex: 'operation_cancel',
                 width: 160,
                 minimumWidth: 160,
                 maximumWidth: 160,
-                delegate: operation,
+                delegate: operation_cancel,
                 editDelegate: edit_box
             }]
         Component.onCompleted: {
@@ -239,7 +301,7 @@ FluContentPage {
     FluTableView {
         id: tbl_view_canceled
         dataSource: []
-        visible : false
+        visible: false
         anchors {
             top: rsvCheck_CB.bottom
             left: parent.left
@@ -278,13 +340,6 @@ FluContentPage {
                 maximumWidth: 120,
                 editDelegate: edit_box
             }, {
-                title: "test",
-                dataIndex: 'ReservationStatus',
-                width: 80,
-                minimumWidth: 120,
-                maximumWidth: 120,
-                editDelegate: edit_box
-            }, {
                 title: "操作",
                 dataIndex: 'operation',
                 width: 160,
@@ -297,39 +352,40 @@ FluContentPage {
         }
     }
 
-
     function load_data_agree() {
-        var dataSource = db_mng.getApprovedReservationsData("agree");
+        var userID = argument.UsrInfo.UserID;
+        var dataSource = db_mng.getApprovedReservationsDataUsers("agree", userID);
         for (var i = 0; i < dataSource.length; ++i) {
-            dataSource[i].operation = tbl_view.customItem(operation);
+            dataSource[i].operation_cancel = tbl_view_agree.customItem(operation_cancel);
             //console.log("Reservations：", i, JSON.stringify(dataSource[i]));
         }
-        tbl_view.dataSource = dataSource;
+        tbl_view_agree.dataSource = dataSource;
     }
     function load_data_reject() {
-        var dataSource = db_mng.getApprovedReservationsData("reject");
+        var userID = argument.UsrInfo.UserID;
+        var dataSource = db_mng.getApprovedReservationsDataUsers("reject", userID);
         for (var i = 0; i < dataSource.length; ++i) {
-            dataSource[i].operation = tbl_view.customItem(operation);
+            dataSource[i].operation = tbl_view_reject.customItem(operation);
             //console.log("Reservations：", i, JSON.stringify(dataSource[i]));
         }
-        tbl_view.dataSource = dataSource;
+        tbl_view_reject.dataSource = dataSource;
     }
     function load_data_unapproved() {
-        var dataSource = db_mng.getApprovedReservationsData("unapproved");
+        var userID = argument.UsrInfo.UserID;
+        var dataSource = db_mng.getApprovedReservationsDataUsers("unapproved", userID);
         for (var i = 0; i < dataSource.length; ++i) {
-            dataSource[i].operation = tbl_view.customItem(operation);
+            dataSource[i].operation_cancel = tbl_view_unapproved.customItem(operation_cancel);
             //console.log("Reservations：", i, JSON.stringify(dataSource[i]));
         }
-        tbl_view.dataSource = dataSource;
+        tbl_view_unapproved.dataSource = dataSource;
     }
     function load_data_canceled() {
-        var dataSource = db_mng.getApprovedReservationsData("canceled");
+        var userID = argument.UsrInfo.UserID;
+        var dataSource = db_mng.getApprovedReservationsDataUsers("canceled", userID);
         for (var i = 0; i < dataSource.length; ++i) {
-            dataSource[i].operation = tbl_view.customItem(operation);
+            dataSource[i].operation = tbl_view_canceled.customItem(operation);
             //console.log("Reservations：", i, JSON.stringify(dataSource[i]));
         }
-        tbl_view.dataSource = dataSource;
+        tbl_view_canceled.dataSource = dataSource;
     }
-
-
 }
