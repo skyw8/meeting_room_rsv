@@ -20,7 +20,9 @@ FluWindow {
     minimumHeight: 200
     launchMode: FluWindowType.SingleTask
     appBar: undefined
-
+    Component.onCompleted:{
+        console.log("usrname: ",argument.UsrInfo.UserName)
+    }
     SettingsViewModel{
         id:viewmodel_settings
     }

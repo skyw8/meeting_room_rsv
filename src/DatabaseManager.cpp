@@ -18,25 +18,33 @@ DatabaseManager::DatabaseManager(QObject *parent) : QObject(parent)
     qDebug() << "Database connection success";
 }
 
-bool DatabaseManager::auth(const QString &account, const QString &password)
+QVariantMap DatabaseManager::auth(const QString &account, const QString &password)
 {
+    QVariantMap userInfo;
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM users WHERE username = :username AND userPassword = :password");
+    query.prepare("SELECT * FROM Users WHERE UserName = :username AND userPassword = :password");
     query.bindValue(":username", account);
     query.bindValue(":password", password);
-    
-    if (!db.isOpen())
-    {
-        qDebug() << "Database connection is not open";
-        return false;
-    }
-    if (!query.exec())
-    {
+
+    if (!query.exec()) {
         qDebug() << "Query execution error:" << query.lastError().text();
-        return false;
+        userInfo.insert("isValid", false);
+        return userInfo;
     }
-    return query.next();
+
+    if (query.next()) {
+        QSqlRecord record = query.record();
+        for (int i = 0; i < record.count(); i++) {
+            userInfo.insert(record.fieldName(i), query.value(i));
+        }
+        userInfo.insert("isValid", true); // 添加验证成功的标记
+    } else {
+        userInfo.insert("isValid", false); // 添加验证失败的标记
+    }
+
+    return userInfo;
 }
+
 
 
 

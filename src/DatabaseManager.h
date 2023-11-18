@@ -20,7 +20,7 @@ class DatabaseManager : public QObject
 
 public:
     explicit DatabaseManager(QObject *parent = nullptr);
-    Q_INVOKABLE bool auth(const QString &account, const QString &password);
+    Q_INVOKABLE QVariantMap auth(const QString &account, const QString &password);
     Q_INVOKABLE QList<QVariantMap> get_tbl_data(const QString &tableName);
     Q_INVOKABLE bool deleteRoom(const QString &roomId);
     Q_INVOKABLE QString getRoomPhoto(const QString &roomId);

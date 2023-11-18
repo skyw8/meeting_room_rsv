@@ -5,8 +5,8 @@ import QtQuick.Layouts
 import Qt.labs.platform
 import FluentUI
 
-FluWindow{
-    id:login
+FluWindow {
+    id: login
     title: "登录"
     width: 400
     height: 300
@@ -14,9 +14,9 @@ FluWindow{
     minimumHeight: 300
     launchMode: FluWindowType.SingleTask
     appBar: undefined
-
+    property var result
     FluAppBar {
-        id:app_bar_login
+        id: app_bar_login
         title: "登录"
         showMinimize: false
         showMaximize: false
@@ -27,37 +27,49 @@ FluWindow{
             left: parent.left
             right: parent.right
         }
-        darkClickListener:(button)=>handleDarkChanged(button)
-        closeClickListener: ()=>{FluApp.exit(0)}
-        z:7
+        darkClickListener: button => handleDarkChanged(button)
+        closeClickListener: () => {
+            FluApp.exit(0);
+        }
+        z: 7
     }
 
     Timer {
         id: delayTimer
         interval: 500
         onTriggered: {
-            FluApp.navigate("/usr",{UserName:accountInput.text.toString()});
-            login.close();
-            
+            if (login.result.UserType === "admin") {
+                FluApp.navigate("/admin", {
+                        UsrInfo: login.result
+                    });
+                login.close();
+            } else if (login.result.UserType === "user") {
+                FluApp.navigate("/usr", {
+                        UsrInfo: login.result
+                    });
+                login.close();
+            } else {
+                console.log("未知用户类型");
+            }
         }
     }
-    ColumnLayout{
+    ColumnLayout {
         anchors.fill: parent
         anchors.centerIn: parent
         spacing: 6
 
-        FluText{
-            text:"会议室预约系统"
-            font:FluTextStyle.Title
-            Layout.alignment:Qt.AlignHCenter
+        FluText {
+            text: "会议室预约系统"
+            font: FluTextStyle.Title
+            Layout.alignment: Qt.AlignHCenter
             Layout.bottomMargin: 10
         }
-        RowLayout{
+        RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            FluText{
-                text:"账号"
+            FluText {
+                text: "账号"
             }
-            FluTextBox{
+            FluTextBox {
                 id: accountInput
                 width: 200
                 placeholderText: "请输入账号"
@@ -65,10 +77,10 @@ FluWindow{
             }
         }
 
-        RowLayout{
+        RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            FluText{
-                text:"密码"
+            FluText {
+                text: "密码"
             }
             FluPasswordBox {
                 id: passwordInput
@@ -77,26 +89,21 @@ FluWindow{
                 Layout.preferredWidth: 200
             }
         }
-        RowLayout{
+        RowLayout {
             Layout.alignment: Qt.AlignHCenter
             FluFilledButton {
                 id: login_btn
                 text: "登录"
                 onClicked: {
-                    var result=db_mng.auth(accountInput.text.toString(), passwordInput.text);
-                    if(!result)
-                    {
+                    login.result = db_mng.auth(accountInput.text.toString(), passwordInput.text);
+                    if (!result.isValid) {
                         showError("请输入正确的账号和密码");
-                    }
-                    else
-                    {
+                    } else {
                         showSuccess("登录成功");
                         delayTimer.start();
                     }
                 }
             }
         }
-
-
     }
 }
