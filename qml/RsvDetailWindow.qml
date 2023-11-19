@@ -16,8 +16,10 @@ FluWindow {
     fixSize: true
     launchMode: FluWindowType.SingleTask
     appBar: undefined
-    Component.onCompleted: {
-        // console.log("test", JSON.stringify(argument.rsvData))
+    property var aprvl_detail: db_mng.getApprovalDetail(argument.rsvData.ReservationID)
+    Component.onCompleted:
+    // console.log("test", JSON.stringify(argument.rsvData))
+    {
     }
     FluAppBar {
         id: app_bar
@@ -89,18 +91,22 @@ FluWindow {
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
+            Text {
+                text: "<b>审批时间:</b> " + aprvl_detail[0]
+                visible: aprvl_detail[0] !== ""
+            }
 
-            /* FluText {
-                    text: "<b>拒绝原因:</b> " + argument.rsvData.RejectionReason
-                    TODO自动换行问题
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                    width: parent.width
-                }*/
+            Text {
+                text: "<b>审批人:</b> " + aprvl_detail[1]
+                visible: aprvl_detail[1] !== ""
+            }
 
+            Text {
+                text: "<b>驳回理由:</b> " + aprvl_detail[2]
+                visible: aprvl_detail[2] !== ""
+            }
         }
     }
-
 
     onClosing:
     //TODO释放资源

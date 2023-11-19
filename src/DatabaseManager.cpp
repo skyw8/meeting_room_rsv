@@ -242,6 +242,35 @@ QString DatabaseManager::getReservationDate(const QString &reservationID)
 
     return QString();
 }
+QStringList DatabaseManager::getApprovalDetail(const QString &reservationID) {
+    QSqlQuery query(db);
+    query.prepare("SELECT ApprovalTime, ApproverID, RejectionReason FROM ApprovalLogs WHERE ReservationID = :reservationID");
+    query.bindValue(":reservationID", reservationID);
+
+    QStringList details;
+
+    if (!query.exec()) {
+        qDebug() << "Query failed:" << query.lastError().text();
+        return details;  // 返回空列表
+    }
+
+    if (query.next()) {
+        QDateTime approvalTime = query.value(0).toDateTime();
+        QString approverID = query.value(1).toString();
+        QString rejectionReason = query.value(2).toString();
+
+        // 将每个字段转换为字符串
+        details << approvalTime.toString(Qt::ISODate);  // 格式化日期时间
+        details << approverID;  // 转换审批者ID为字符串
+        details << rejectionReason;  // 转换拒绝理由为字符串
+    } else {
+        // 如果没有找到记录，则添加空字符串
+        details << "" << "" << "";
+    }
+
+    return details;
+}
+
 
 QList<QVariantMap> DatabaseManager::getApprovedReservationsData(const QString &status)
 {
@@ -303,6 +332,7 @@ QList<QVariantMap> DatabaseManager::getApprovedReservationsDataUsers(const QStri
 }
 
 
+
 bool DatabaseManager::cancelReservation(const QString &reservationID) {
     QSqlQuery query(db);
     query.prepare("UPDATE Reservations SET ReservationStatus = 'canceled' WHERE ReservationID = :reservationID");
@@ -315,25 +345,118 @@ bool DatabaseManager::cancelReservation(const QString &reservationID) {
 
     return true;
 }
-bool DatabaseManager::agreeReservation(const QString &reservationID) {
+bool DatabaseManager::agreeReservation(const QString &reservationID, const QString &approverID) {
+    QSqlDatabase transactionDatabase = QSqlDatabase::database();
+    transactionDatabase.transaction(); // 开始一个新的事务
+
     QSqlQuery query(db);
+
+    // 更新 Reservations 表
     query.prepare("UPDATE Reservations SET ReservationStatus = 'agree' WHERE ReservationID = :reservationID");
     query.bindValue(":reservationID", reservationID);
-
     if (!query.exec()) {
         qDebug() << "Update failed:" << query.lastError().text();
+        transactionDatabase.rollback(); // 如果失败，则回滚事务
         return false;
     }
 
+    // 插入 ApprovalLogs 表
+    query.prepare("INSERT INTO ApprovalLogs (ReservationID, ApprovalTime, ApproverID) VALUES (:reservationID, NOW(), :approverID)");
+    query.bindValue(":reservationID", reservationID);
+    query.bindValue(":approverID", approverID);
+    if (!query.exec()) {
+        qDebug() << "Insert into ApprovalLogs failed:" << query.lastError().text();
+        transactionDatabase.rollback(); // 如果失败，则回滚事务
+        return false;
+    }
+
+    transactionDatabase.commit(); // 提交事务
     return true;
 }
-bool DatabaseManager::rejectReservation(const QString &reservationID) {
+
+bool DatabaseManager::rejectReservation(const QString &reservationID, const QString &approverID, const QString &rejectionReason) {
+    QSqlDatabase transactionDatabase = QSqlDatabase::database();
+    transactionDatabase.transaction(); // 开始一个新的事务
+
     QSqlQuery query(db);
+
+    // 更新 Reservations 表
     query.prepare("UPDATE Reservations SET ReservationStatus = 'reject' WHERE ReservationID = :reservationID");
     query.bindValue(":reservationID", reservationID);
-
     if (!query.exec()) {
         qDebug() << "Update failed:" << query.lastError().text();
+        transactionDatabase.rollback(); // 如果失败，则回滚事务
+        return false;
+    }
+
+    // 插入 ApprovalLogs 表
+    query.prepare("INSERT INTO ApprovalLogs (ReservationID, ApprovalTime, ApproverID, RejectionReason) VALUES (:reservationID, NOW(), :approverID, :rejectionReason)");
+    query.bindValue(":reservationID", reservationID);
+    query.bindValue(":approverID", approverID);
+    query.bindValue(":rejectionReason", rejectionReason);
+    if (!query.exec()) {
+        qDebug() << "Insert into ApprovalLogs failed:" << query.lastError().text();
+        transactionDatabase.rollback(); // 如果失败，则回滚事务
+        return false;
+    }
+
+    transactionDatabase.commit(); // 提交事务
+    return true;
+}
+
+
+QList<QVariantMap> DatabaseManager::filterMeetingRooms(int capacity, const QDate &date, const QString &startTimeText, const QString &endTimeText) {
+    const QTime startTime = QTime::fromString(startTimeText + ":00:00", "HH:mm:ss");
+    const QTime endTime = QTime::fromString(endTimeText + ":00:00", "HH:mm:ss");
+    QList<QVariantMap> availableRooms;
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM MeetingRooms WHERE Capacity >= :capacity AND RoomID NOT IN "
+                  "(SELECT RoomID FROM Reservations WHERE ReservationDate = :date AND "
+                  "ReservationStatus = 'agree' AND"
+                  "((StartTime <= :startTime AND EndTime > :startTime) OR "
+                  "(StartTime < :endTime AND EndTime >= :endTime) OR "
+                  "(StartTime >= :startTime AND EndTime <= :endTime)))");
+    query.bindValue(":capacity", capacity);
+    query.bindValue(":date", date);
+    query.bindValue(":startTime", startTime);
+    query.bindValue(":endTime", endTime);
+
+    if (query.exec()) {
+        QSqlRecord record = query.record();
+        while (query.next()) {
+            QVariantMap roomData;
+            for (int i = 0; i < record.count(); ++i) {
+                roomData.insert(record.fieldName(i), query.value(i));
+            }
+            availableRooms.append(roomData);
+        }
+    } else {
+        qDebug() << "Query failed:" << query.lastError().text();
+    }
+
+    return availableRooms;
+}
+
+bool DatabaseManager::addReservation(const QString &userID, const QString &roomID, const QString &dateStr, const QString &startTimeStr, const QString &endTimeStr, int attendance, const QString &meetingTheme) {
+    QSqlQuery query(db);
+
+    // 转换日期和时间为适合数据库的格式
+    QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
+    QTime startTime = QTime::fromString(startTimeStr + ":00:00", "HH:mm:ss");
+    QTime endTime = QTime::fromString(endTimeStr + ":00:00", "HH:mm:ss");
+
+    query.prepare("INSERT INTO Reservations (ReservationID, UserID, RoomID, ReservationDate, StartTime, EndTime, Attendance, MeetingTheme, ReservationStatus) "
+                  "VALUES (UUID(), :userID, :roomID, :date, :startTime, :endTime, :attendance, :meetingTheme, 'unapproved')");
+    query.bindValue(":userID", userID);
+    query.bindValue(":roomID", roomID);
+    query.bindValue(":date", date);
+    query.bindValue(":startTime", startTime);
+    query.bindValue(":endTime", endTime);
+    query.bindValue(":attendance", attendance);
+    query.bindValue(":meetingTheme", meetingTheme);
+
+    if (!query.exec()) {
+        qDebug() << "Insert failed:" << query.lastError().text();
         return false;
     }
 

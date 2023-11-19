@@ -22,7 +22,6 @@ FluContentPage {
                     id: btn_detail
                     text: "详情"
                     onClicked: {
-                        //var obj = activeTableView.dataSource[rsvCheck_page.currentRowIndex];
                         currentRowIndex = row;
                         var obj = activeTableView.dataSource[currentRowIndex];
                         console.log("传递的数据：", JSON.stringify(obj));

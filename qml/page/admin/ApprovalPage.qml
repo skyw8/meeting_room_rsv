@@ -9,6 +9,15 @@ FluContentPage {
     id: rsvCheck_page
     title: "预约记录"
     property int currentRowIndex: -1
+    property var rejectWindowRegister: registerForWindowResult("/reject")
+    Connections{
+        target: rejectWindowRegister
+        function onResult(result){
+            console.log(result.msg)
+            showSuccess(result.msg)
+            load_data_unapproved()
+        }
+    }
     Component.onCompleted: {
         load_data_unapproved();
     }
@@ -36,7 +45,7 @@ FluContentPage {
                     onClicked: {
                         currentRowIndex = row;
                         var obj = tbl_view_unapproved.dataSource[currentRowIndex];
-                        var success = db_mng.agreeReservation(obj.ReservationID);
+                        var success = db_mng.agreeReservation(obj.ReservationID,argument.UsrInfo.UserID);
                         if (success) {
                             showSuccess("操作成功");
                             load_data_unapproved();
@@ -51,13 +60,11 @@ FluContentPage {
                     onClicked: {
                         currentRowIndex = row;
                         var obj = tbl_view_unapproved.dataSource[currentRowIndex];
-                        var success = db_mng.rejectReservation(obj.ReservationID);
-                        if (success) {
-                            showSuccess("操作成功");
-                            load_data_unapproved();
-                        } else {
-                            showError("操作失败");
+                        var log_data={
+                            reservationID: obj.ReservationID,
+                            approverID: argument.UsrInfo.UserID
                         }
+                        rejectWindowRegister.launch({logData:log_data})
                     }
                 }
             }

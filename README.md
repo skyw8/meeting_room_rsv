@@ -2,6 +2,9 @@
 
 
 ```sql
+
+CREATE DATABASE meeting_room_rsv;
+USE meeting_room_rsv;
 CREATE TABLE Users (
     UserID numeric(25) PRIMARY KEY,
     UserName VARCHAR(255) UNIQUE,
@@ -31,7 +34,7 @@ CREATE TABLE MeetingRoomSchedules (
 
 
 CREATE TABLE Reservations (
-    ReservationID VARCHAR(25) PRIMARY KEY,
+    ReservationID VARCHAR(36) PRIMARY KEY,
     UserID numeric(25),
     RoomID VARCHAR(25),
     ReservationDate DATE,
@@ -41,12 +44,12 @@ CREATE TABLE Reservations (
     MeetingTheme VARCHAR(255),
     ReservationStatus ENUM('agree', 'reject','unapproved', 'canceled'),
     FOREIGN KEY (UserID) REFERENCES Users(UserID),
-    FOREIGN KEY (RoomID) REFERENCES MeetingRooms(RoomID)
+    FOREIGN KEY (RoomID) REFERENCES MeetingRoom(RoomID)
 );
 
 
 CREATE TABLE ApprovalLogs (
-    ReservationID VARCHAR(25),
+    ReservationID VARCHAR(36),
     ApprovalTime DATETIME,
     ApproverID numeric(25),
     RejectionReason VARCHAR(1023),
