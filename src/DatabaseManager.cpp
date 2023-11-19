@@ -315,3 +315,27 @@ bool DatabaseManager::cancelReservation(const QString &reservationID) {
 
     return true;
 }
+bool DatabaseManager::agreeReservation(const QString &reservationID) {
+    QSqlQuery query(db);
+    query.prepare("UPDATE Reservations SET ReservationStatus = 'agree' WHERE ReservationID = :reservationID");
+    query.bindValue(":reservationID", reservationID);
+
+    if (!query.exec()) {
+        qDebug() << "Update failed:" << query.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+bool DatabaseManager::rejectReservation(const QString &reservationID) {
+    QSqlQuery query(db);
+    query.prepare("UPDATE Reservations SET ReservationStatus = 'reject' WHERE ReservationID = :reservationID");
+    query.bindValue(":reservationID", reservationID);
+
+    if (!query.exec()) {
+        qDebug() << "Update failed:" << query.lastError().text();
+        return false;
+    }
+
+    return true;
+}

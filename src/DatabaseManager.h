@@ -31,6 +31,8 @@ public:
     Q_INVOKABLE QList<QVariantMap> getApprovedReservationsData(const QString &status);
     Q_INVOKABLE QList<QVariantMap> getApprovedReservationsDataUsers(const QString &status, const QString &userID);
     Q_INVOKABLE bool cancelReservation(const QString &reservationID);
+    Q_INVOKABLE bool agreeReservation(const QString &reservationID);
+    Q_INVOKABLE bool rejectReservation(const QString &reservationID);
 
 private:
     QSqlDatabase db;
