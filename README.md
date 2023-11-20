@@ -1,8 +1,28 @@
-**Database meeting_room_rsv** 
+# meeting_room_rsv
+
+
+
+## Get Started
+
+```shell
+git clone --recursive https://github.com/zhuzichu520/FluentUI.git
+git clone https://github.com/SkywalkerZoZ/meeting_room_rsv.git
+```
+
+
+
+## Build
+
+**Qt 6.60**
+
+**MSVC2019-64bit**
+
+
+
+## Create Database
 
 
 ```sql
-
 CREATE DATABASE meeting_room_rsv;
 USE meeting_room_rsv;
 CREATE TABLE Users (
