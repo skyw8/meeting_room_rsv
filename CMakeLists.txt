@@ -78,3 +78,15 @@ install(TARGETS meeting_room_rsv
 )
 
 add_subdirectory(FluentUI)
+
+if(WIN32)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set_target_properties(meeting_room_rsv PROPERTIES
+            WIN32_EXECUTABLE FALSE
+        )
+    else()
+        set_target_properties(meeting_room_rsv PROPERTIES
+            WIN32_EXECUTABLE TRUE
+        )
+    endif()
+endif()

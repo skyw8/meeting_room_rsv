@@ -23,9 +23,6 @@ FluWindow {
     Component.onCompleted:{
         console.log("usrname: ",argument.UsrInfo.UserID)
     }
-    SettingsViewModel{
-        id:viewmodel_settings
-    }
 
     SystemTrayIcon {
         id:system_tray
@@ -174,7 +171,6 @@ FluWindow {
         items: usr_items
         footerItems: footer_items
         topPadding: FluTools.isMacos() ? 20 : 0
-        displayMode: viewmodel_settings.displayMode
         logo: "qrc:meeting_room_rsv/res/rsv.png"
         title: "会议室预约系统"
         Component.onCompleted: {
