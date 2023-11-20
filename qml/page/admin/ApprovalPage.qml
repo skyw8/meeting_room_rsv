@@ -13,7 +13,6 @@ FluContentPage {
     Connections{
         target: rejectWindowRegister
         function onResult(result){
-            console.log(result.msg)
             showSuccess(result.msg)
             load_data_unapproved()
         }
@@ -32,8 +31,6 @@ FluContentPage {
                     onClicked: {
                         currentRowIndex = row;
                         var obj = tbl_view_unapproved.dataSource[currentRowIndex];
-                        console.log("传递的数据：", JSON.stringify(obj));
-                        console.log("查看详情", obj.ReservationID);
                         FluApp.navigate("/rsv_detail", {
                                 rsvData: obj
                             });

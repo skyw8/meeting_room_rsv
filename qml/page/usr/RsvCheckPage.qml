@@ -22,11 +22,8 @@ FluContentPage {
                     id: btn_detail
                     text: "详情"
                     onClicked: {
-                        //var obj = activeTableView.dataSource[rsvCheck_page.currentRowIndex];
                         currentRowIndex = row;
                         var obj = activeTableView.dataSource[currentRowIndex];
-                        console.log("传递的数据：", JSON.stringify(obj));
-                        console.log("查看详情", obj.ReservationID);
                         FluApp.navigate("/rsv_detail", {
                                 rsvData: obj
                             });
@@ -67,8 +64,6 @@ FluContentPage {
                         //var obj = activeTableView.dataSource[rsvCheck_page.currentRowIndex];
                         currentRowIndex = row;
                         var obj = activeTableView.dataSource[currentRowIndex];
-                        console.log("传递的数据：", JSON.stringify(obj));
-                        console.log("查看详情", obj.ReservationID);
                         FluApp.navigate("/rsv_detail", {
                                 rsvData: obj
                             });

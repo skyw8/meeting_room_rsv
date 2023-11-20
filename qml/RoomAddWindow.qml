@@ -111,7 +111,6 @@ FluWindow {
                 fileMode: FileDialog.OpenFile
                 nameFilters: ["Image files (*.jpeg *.jpg *.png)"]  // 设置文件过滤器
                 onAccepted: {
-                    console.log(selectedFile);
                     imagePreview.source = selectedFile;
                     
                 }
@@ -144,12 +143,10 @@ FluWindow {
                 // 添加到数据库
                 var success = db_mng.addRoom(roomID, roomName, capacity, roomArea, description, photoPath);
                 if (success) {
-                    console.log("数据保存成功")
                     showSuccess("数据保存成功")
                     onResult({msg:"添加保存成功"})
                     room_add.close()
                 } else {
-                    console.log("数据保存失败")
                     showError("数据保存失败")
                     // 显示错误信息或进行其他操作
                 }

@@ -17,6 +17,8 @@ git clone https://github.com/SkywalkerZoZ/meeting_room_rsv.git
 
 **MSVC2019-64bit**
 
+QtCreator or VS
+
 
 
 ## Create Database
@@ -64,7 +66,7 @@ CREATE TABLE Reservations (
     MeetingTheme VARCHAR(255),
     ReservationStatus ENUM('agree', 'reject','unapproved', 'canceled'),
     FOREIGN KEY (UserID) REFERENCES Users(UserID),
-    FOREIGN KEY (RoomID) REFERENCES MeetingRoom(RoomID)
+    FOREIGN KEY (RoomID) REFERENCES MeetingRooms(RoomID)
 );
 
 

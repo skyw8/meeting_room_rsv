@@ -19,7 +19,6 @@ FluWindow {
     appBar: undefined
     property bool photoChanged: false
     Component.onCompleted: {
-        console.log("argument.roomData", JSON.stringify(argument.roomData))
     }
     FluAppBar {
         id: app_bar
@@ -118,7 +117,6 @@ FluWindow {
                 fileMode: FileDialog.OpenFile
                 nameFilters: ["Image files (*.jpeg *.jpg *.png)"]  // 设置文件过滤器
                 onAccepted: {
-                    console.log(selectedFile);
                     imagePreview.source = selectedFile;
                     room_edit.photoChanged = true;
                 }
@@ -153,11 +151,9 @@ FluWindow {
                 // 添加到数据库
                 var success = db_mng.updateRoom(roomID, roomName, capacity, roomArea, description, photoPath);
                 if (success) {
-                    console.log("数据保存成功")
                     onResult({msg:"编辑保存成功"})
                     room_edit.close();
                 } else {
-                    console.log("数据保存失败")
                     showError("数据保存失败")
                     // 显示错误信息或进行其他操作
                 }

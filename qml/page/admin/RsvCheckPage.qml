@@ -24,8 +24,6 @@ FluContentPage {
                     onClicked: {
                         currentRowIndex = row;
                         var obj = activeTableView.dataSource[currentRowIndex];
-                        console.log("传递的数据：", JSON.stringify(obj));
-                        console.log("查看详情", obj.ReservationID);
                         FluApp.navigate("/rsv_detail", {
                                 rsvData: obj
                             });

@@ -5,8 +5,6 @@ import QtQuick.Layouts
 import Qt.labs.platform
 import FluentUI
 import meeting_room_rsv
-//import "qrc:/meeting_room_rsv/qml/global"
-//import "qrc:/meeting_room_rsv/qml/viewmodel"
 
 
 
@@ -21,7 +19,7 @@ FluWindow {
     launchMode: FluWindowType.SingleTask
     appBar: undefined
     Component.onCompleted:{
-        console.log("usrname: ",argument.UsrInfo.UserName)
+        // console.log("usrname: ",argument.UsrInfo.UserName)
     }
 
     SystemTrayIcon {
@@ -177,11 +175,8 @@ FluWindow {
             admin_items.paneItemMenu = nav_item_right_menu
             footer_items.navigationView = nav_view
             footer_items.paneItemMenu = nav_item_right_menu
-            setCurrentIndex(0)
-            console.log(footerItems)
-        }
+            setCurrentIndex(0)        }
         Component.onDestruction:{
-            console.log(footerItems)
         }
     }
     Component{

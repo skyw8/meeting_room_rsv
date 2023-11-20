@@ -57,14 +57,12 @@ FluWindow {
                 var result = db_mng.rejectReservation(argument.logData.reservationID, argument.logData.approverID, reject_reason.text);
                 if(result)
                 {
-                    console.log("操作成功")
                     showError("操作成功")
                     onResult({msg: "驳回成功"})
                     reject.close()
                 }
                 else
                 {
-                    console.log("操作失败")
                     showError("操作失败")
                 }
                 

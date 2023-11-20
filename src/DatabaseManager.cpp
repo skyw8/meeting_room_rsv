@@ -117,7 +117,6 @@ QString DatabaseManager::getRoomPhoto(const QString &roomId)
         }
 
         QString encodedString = imageData.toBase64();
-        qDebug() << encodedString;
         return QString("data:image/" + type + ";base64,") + encodedString;
     }
 

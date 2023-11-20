@@ -18,7 +18,6 @@ FluWindow {
     launchMode: FluWindowType.SingleTask
     appBar: undefined
     Component.onCompleted: {
-        console.log("传递的数据:", JSON.stringify(argument.rsvData));
     }
     FluAppBar {
         id: app_bar

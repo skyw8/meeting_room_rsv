@@ -23,8 +23,6 @@ FluContentPage {
                     onClicked: {
                         currentRowIndex = row;
                         var obj = tbl_view.dataSource[currentRowIndex]
-                        console.log("传递的数据：", JSON.stringify(obj))
-                        console.log("查看详情", obj.RoomID)
                         FluApp.navigate("/room_detail", {roomData: obj});
                     }
                 }

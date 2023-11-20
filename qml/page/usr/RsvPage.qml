@@ -8,7 +8,6 @@ FluContentPage {
     title: "会议室"
     property var time_range: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
     Component.onCompleted: {
-        console.log("rsvpage: ",argument.UsrInfo.UserID)
     }
     property var rsvPageRegister: registerForWindowResult("/rsv")
     Connections {
@@ -107,7 +106,6 @@ FluContentPage {
                         FluApp.navigate("/room_detail", {
                                 roomData: obj
                             });
-                        console.log("详情", obj.RoomID);
                     }
                 }
                 FluFilledButton {
@@ -115,7 +113,6 @@ FluContentPage {
                     text: "预约"
                     onClicked: {
                         var obj = tbl_view.dataSource[row];
-                        console.log("预约", obj.RoomID);
                         var reservation = {
                             roomID: obj.RoomID,
                             attendance: parseInt(attendance_box.text),
@@ -124,7 +121,6 @@ FluContentPage {
                             endTime: end_time.currentText,
                             userID: argument.UsrInfo.UserID
                         };
-                        console.log("传递日期:",reservation.date);
                         rsvPageRegister.launch({rsvData:reservation})
                     }
                 }

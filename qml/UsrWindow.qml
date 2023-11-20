@@ -21,7 +21,6 @@ FluWindow {
     launchMode: FluWindowType.SingleTask
     appBar: undefined
     Component.onCompleted:{
-        console.log("usrname: ",argument.UsrInfo.UserID)
     }
 
     SystemTrayIcon {
@@ -179,10 +178,8 @@ FluWindow {
             footer_items.navigationView = nav_view
             footer_items.paneItemMenu = nav_item_right_menu
             setCurrentIndex(0)
-            console.log(footerItems)
         }
         Component.onDestruction:{
-            console.log(footerItems)
         }
     }
     Component{

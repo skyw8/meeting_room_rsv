@@ -16,18 +16,16 @@ FluContentPage {
     Connections {
         target: roomAddPageRegister
         function onResult(result) {
-            console.log("room_add result:", result.msg)
             showSuccess(result.msg)
-            load_data() // 当 RoomAddWindow 关闭时，调用 load_data() 刷新数据
+            load_data()
         }
     }
     property var roomEditPageRegister: registerForWindowResult("/room_edit")
     Connections {
         target: roomEditPageRegister
         function onResult(result) {
-            console.log("room_edit result:", result.msg)
             showSuccess(result.msg)
-            load_data() // 当 RoomEditWindow 关闭时，调用 load_data() 刷新数据
+            load_data()
         }
     }
     FluContentDialog {
@@ -37,7 +35,6 @@ FluContentPage {
         negativeText: "取消"
         buttonFlags: FluContentDialogType.NegativeButton | FluContentDialogType.PositiveButton
         onNegativeClicked: {
-            console.log("取消删除");
         }
         positiveText: "确定"
         onPositiveClicked: {
@@ -62,8 +59,6 @@ FluContentPage {
                     onClicked: {
                         currentRowIndex = row;
                         var obj = tbl_view.dataSource[currentRowIndex]
-                        console.log("传递的数据：", JSON.stringify(obj))
-                        console.log("查看详情", obj.RoomID)
                         FluApp.navigate("/room_detail", {roomData: obj});
                     }
                 }
@@ -73,8 +68,6 @@ FluContentPage {
                     onClicked: {
                         currentRowIndex = row;
                         var obj = tbl_view.dataSource[currentRowIndex]
-                        console.log("传递的数据：", JSON.stringify(obj))
-                        console.log("编辑会议室", obj.RoomID)
                         roomEditPageRegister.launch({roomData: obj})
                     }
                 }
@@ -126,7 +119,6 @@ FluContentPage {
         }
         text: "添加"
         onClicked: {
-            console.log("添加会议室");
             roomAddPageRegister.launch();
         }
     }
