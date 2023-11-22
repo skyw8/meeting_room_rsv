@@ -71,14 +71,14 @@ FluWindow {
             text: "预约"
             Layout.alignment: Qt.AlignHCenter
             onClicked: {
-                var userID = argument.rsvData.userID; // 获取用户ID
+                var userID = argument.rsvData.userID;
                 var roomID = argument.rsvData.roomID;
-                var date = argument.rsvData.date; // 假设是 'yyyy-MM-dd' 格式的字符串
+                var date = argument.rsvData.date;
                 var startTime = argument.rsvData.startTime;
                 var endTime = argument.rsvData.endTime;
                 var attendance = parseInt(argument.rsvData.attendance);
                 var meetingTheme = room_id_box.text;
-                var result = db_mng.addReservation(userID, roomID, date, startTime, endTime, attendance, meetingTheme);
+                var result = db_mng.addRsv(userID, roomID, date, startTime, endTime, attendance, meetingTheme);
                 if (result) {
                     onResult({
                             msg: "预约已提交"

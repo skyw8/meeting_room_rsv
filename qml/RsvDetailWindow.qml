@@ -16,10 +16,8 @@ FluWindow {
     fixSize: true
     launchMode: FluWindowType.SingleTask
     appBar: undefined
-    property var aprvl_detail: db_mng.getApprovalDetail(argument.rsvData.ReservationID)
-    Component.onCompleted:
-    // console.log("test", JSON.stringify(argument.rsvData))
-    {
+    property var aprvl_detail: db_mng.getLogs(argument.rsvData.ReservationID)
+    Component.onCompleted: {
     }
     FluAppBar {
         id: app_bar
@@ -50,66 +48,74 @@ FluWindow {
             spacing: 10
             width: parent.width
 
-            Text {
+            FluText {
                 text: "<b>预约编号:</b> " + argument.rsvData.ReservationID
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
+            FluText {
                 text: "<b>会议室编号:</b> " + argument.rsvData.RoomID
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
-                text: "<b>预约日期:</b> " + db_mng.getReservationDate(argument.rsvData.ReservationID)
+            FluText {
+                text: "<b>预约日期:</b> " + db_mng.getRsvDate(argument.rsvData.ReservationID)
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
 
-            Text {
+            FluText {
                 text: "<b>开始时间:</b> " + argument.rsvData.StartTime
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
+            FluText {
                 text: "<b>结束时间:</b> " + argument.rsvData.EndTime
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
+            FluText {
                 text: "<b>参会人数:</b> " + argument.rsvData.Attendance
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
+            FluText {
                 text: "<b>会议主题:</b> " + argument.rsvData.MeetingTheme
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
-                text: "<b>审批情况:</b> " + argument.rsvData.ReservationStatus
+            FluText {
+                text: {
+                    switch (argument.rsvData.ReservationStatus) {
+                    case 'agree':
+                        return "<b>审批情况:</b> 已通过";
+                    case 'reject':
+                        return "<b>审批情况:</b> 已驳回";
+                    case 'unapproved':
+                        return "<b>审批情况:</b> 未审批";
+                    case 'canceled':
+                        return "<b>审批情况:</b> 已取消";
+                    default:
+                        return "<b>审批情况:</b> 未知状态";
+                    }
+                }
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
+            FluText {
                 text: "<b>审批时间:</b> " + aprvl_detail[0]
                 visible: aprvl_detail[0] !== ""
             }
 
-            Text {
+            FluText {
                 text: "<b>审批人:</b> " + aprvl_detail[1]
                 visible: aprvl_detail[1] !== ""
             }
 
-            Text {
+            FluText {
                 text: "<b>驳回理由:</b> " + aprvl_detail[2]
                 visible: aprvl_detail[2] !== ""
             }
         }
-    }
-
-    onClosing:
-    //TODO释放资源
-    {
     }
 }

@@ -5,8 +5,7 @@ import QtQuick.Layouts
 import Qt.labs.platform
 import FluentUI
 import meeting_room_rsv
-//import "qrc:/meeting_room_rsv/qml/global"
-//import "qrc:/meeting_room_rsv/qml/viewmodel"
+
 
 
 
@@ -163,9 +162,6 @@ FluWindow {
         height: parent.height
         cellWidth: 200
         z:999
-        //Stack模式，每次切换都会将页面压入栈中，随着栈的页面增多，消耗的内存也越多，内存消耗多就会卡顿，这时候就需要按返回将页面pop掉，释放内存。该模式可以配合FluPage中的launchMode属性，设置页面的启动模式
-        //                pageMode: FluNavigationViewType.Stack
-        //NoStack模式，每次切换都会销毁之前的页面然后创建一个新的页面，只需消耗少量内存，可以配合FluViewModel保存页面数据（推荐）
         pageMode: FluNavigationViewType.NoStack
         items: usr_items
         footerItems: footer_items

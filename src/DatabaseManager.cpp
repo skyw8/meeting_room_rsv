@@ -48,13 +48,11 @@ QVariantMap DatabaseManager::auth(const QString &account, const QString &passwor
 
 
 
-QList<QVariantMap> DatabaseManager::get_tbl_data(const QString &tableName)
+QList<QVariantMap> DatabaseManager::getRooms()
 {
     QList<QVariantMap> dataList;
-
-    // 执行查询
     QSqlQuery query(db);
-    if (query.exec(QString("SELECT * FROM %1").arg(tableName))) {
+    if (query.exec(QString("SELECT * FROM MeetingRooms"))) {
         QSqlRecord record = query.record();
         
         while (query.next()) {
@@ -73,7 +71,7 @@ QList<QVariantMap> DatabaseManager::get_tbl_data(const QString &tableName)
     return dataList;
 }
 
-bool DatabaseManager::deleteRoom(const QString &roomId)
+bool DatabaseManager::delRoom(const QString &roomId)
 {
     QSqlQuery query(db);
     query.prepare("DELETE FROM MeetingRooms WHERE RoomID = :roomId");
@@ -223,7 +221,7 @@ QList<QVariantMap> DatabaseManager::searchRooms(const QString &searchText) {
 
     return dataList;
 }
-QString DatabaseManager::getReservationDate(const QString &reservationID)
+QString DatabaseManager::getRsvDate(const QString &reservationID)
 {
     QSqlQuery query(db);
     query.prepare("SELECT ReservationDate FROM Reservations WHERE ReservationID = :reservationID");
@@ -241,7 +239,7 @@ QString DatabaseManager::getReservationDate(const QString &reservationID)
 
     return QString();
 }
-QStringList DatabaseManager::getApprovalDetail(const QString &reservationID) {
+QStringList DatabaseManager::getLogs(const QString &reservationID) {
     QSqlQuery query(db);
     query.prepare("SELECT ApprovalTime, ApproverID, RejectionReason FROM ApprovalLogs WHERE ReservationID = :reservationID");
     query.bindValue(":reservationID", reservationID);
@@ -271,7 +269,7 @@ QStringList DatabaseManager::getApprovalDetail(const QString &reservationID) {
 }
 
 
-QList<QVariantMap> DatabaseManager::getApprovedReservationsData(const QString &status)
+QList<QVariantMap> DatabaseManager::getApprovedRsv(const QString &status)
 {
     QList<QVariantMap> dataList;
 
@@ -301,7 +299,7 @@ QList<QVariantMap> DatabaseManager::getApprovedReservationsData(const QString &s
 }
 
 
-QList<QVariantMap> DatabaseManager::getApprovedReservationsDataUsers(const QString &status, const QString &userID) {
+QList<QVariantMap> DatabaseManager::getApprovedRsvUsers(const QString &status, const QString &userID) {
     QList<QVariantMap> dataList;
 
     // 执行查询
@@ -332,7 +330,7 @@ QList<QVariantMap> DatabaseManager::getApprovedReservationsDataUsers(const QStri
 
 
 
-bool DatabaseManager::cancelReservation(const QString &reservationID) {
+bool DatabaseManager::cancelRsv(const QString &reservationID) {
     QSqlQuery query(db);
     query.prepare("UPDATE Reservations SET ReservationStatus = 'canceled' WHERE ReservationID = :reservationID");
     query.bindValue(":reservationID", reservationID);
@@ -344,7 +342,7 @@ bool DatabaseManager::cancelReservation(const QString &reservationID) {
 
     return true;
 }
-bool DatabaseManager::agreeReservation(const QString &reservationID, const QString &approverID) {
+bool DatabaseManager::agreeRsv(const QString &reservationID, const QString &approverID) {
     QSqlDatabase transactionDatabase = QSqlDatabase::database();
     transactionDatabase.transaction(); // 开始一个新的事务
 
@@ -373,7 +371,7 @@ bool DatabaseManager::agreeReservation(const QString &reservationID, const QStri
     return true;
 }
 
-bool DatabaseManager::rejectReservation(const QString &reservationID, const QString &approverID, const QString &rejectionReason) {
+bool DatabaseManager::rejectRsv(const QString &reservationID, const QString &approverID, const QString &rejectionReason) {
     QSqlDatabase transactionDatabase = QSqlDatabase::database();
     transactionDatabase.transaction(); // 开始一个新的事务
 
@@ -404,7 +402,7 @@ bool DatabaseManager::rejectReservation(const QString &reservationID, const QStr
 }
 
 
-QList<QVariantMap> DatabaseManager::filterMeetingRooms(int capacity, const QDate &date, const QString &startTimeText, const QString &endTimeText) {
+QList<QVariantMap> DatabaseManager::filterRooms(int capacity, const QDate &date, const QString &startTimeText, const QString &endTimeText) {
     const QTime startTime = QTime::fromString(startTimeText + ":00:00", "HH:mm:ss");
     const QTime endTime = QTime::fromString(endTimeText + ":00:00", "HH:mm:ss");
     QList<QVariantMap> availableRooms;
@@ -436,7 +434,7 @@ QList<QVariantMap> DatabaseManager::filterMeetingRooms(int capacity, const QDate
     return availableRooms;
 }
 
-bool DatabaseManager::addReservation(const QString &userID, const QString &roomID, const QString &dateStr, const QString &startTimeStr, const QString &endTimeStr, int attendance, const QString &meetingTheme) {
+bool DatabaseManager::addRsv(const QString &userID, const QString &roomID, const QString &dateStr, const QString &startTimeStr, const QString &endTimeStr, int attendance, const QString &meetingTheme) {
     QSqlQuery query(db);
 
     // 转换日期和时间为适合数据库的格式

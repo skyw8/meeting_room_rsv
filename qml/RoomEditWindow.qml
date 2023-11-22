@@ -130,7 +130,6 @@ FluWindow {
             sourceSize.width: parent.width // 限制加载的图像宽度
             sourceSize.height: 80
             source: db_mng.getRoomPhoto(argument.roomData.RoomID)
-            // visible: imagePreview.status === Image.Ready
         }
         FluFilledButton {
             text: "保存"
@@ -159,9 +158,5 @@ FluWindow {
                 }
             }
         }
-    }
-    onClosing:
-    //TODO释放资源
-    {
     }
 }

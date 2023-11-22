@@ -7,25 +7,25 @@ import meeting_room_rsv
 FluContentPage {
     id: root_page
     title: "会议室"
-    property int currentRowIndex: -1
+    property int current_idx: -1
     Component.onCompleted: {
-        load_data();
+        loadData(db_mng.getRooms())
     }
     
-    property var roomAddPageRegister: registerForWindowResult("/room_add")
+    property var add_win_register: registerForWindowResult("/room_add")
     Connections {
-        target: roomAddPageRegister
+        target: add_win_register
         function onResult(result) {
             showSuccess(result.msg)
-            load_data()
+            loadData(db_mng.getRooms())
         }
     }
-    property var roomEditPageRegister: registerForWindowResult("/room_edit")
+    property var edit_win_register: registerForWindowResult("/room_edit")
     Connections {
-        target: roomEditPageRegister
+        target: edit_win_register
         function onResult(result) {
             showSuccess(result.msg)
-            load_data()
+            loadData(db_mng.getRooms())
         }
     }
     FluContentDialog {
@@ -38,11 +38,11 @@ FluContentPage {
         }
         positiveText: "确定"
         onPositiveClicked: {
-            var obj = tbl_view.tableModel.getRow(currentRowIndex);
-            var result = db_mng.deleteRoom(obj.RoomID);
+            var obj = tbl_view.tableModel.getRow(current_idx);
+            var result = db_mng.delRoom(obj.RoomID);
             if (result) {
                 showSuccess("删除成功");
-                load_data();
+                loadData(db_mng.getRooms())
             } else {
                 showError("删除失败");
             }
@@ -57,8 +57,8 @@ FluContentPage {
                     id: btn_detail
                     text: "详情"
                     onClicked: {
-                        currentRowIndex = row;
-                        var obj = tbl_view.dataSource[currentRowIndex]
+                        current_idx = row;
+                        var obj = tbl_view.dataSource[current_idx]
                         FluApp.navigate("/room_detail", {roomData: obj});
                     }
                 }
@@ -66,16 +66,16 @@ FluContentPage {
                     id: btn_edit
                     text: "编辑"
                     onClicked: {
-                        currentRowIndex = row;
-                        var obj = tbl_view.dataSource[currentRowIndex]
-                        roomEditPageRegister.launch({roomData: obj})
+                        current_idx = row;
+                        var obj = tbl_view.dataSource[current_idx]
+                        edit_win_register.launch({roomData: obj})
                     }
                 }
                 FluFilledButton {
                     id: btn_del
                     text: "删除"
                     onClicked: {
-                        currentRowIndex = row;
+                        current_idx = row;
                         del_dialog.open();
                     }
                 }
@@ -107,11 +107,11 @@ FluContentPage {
         onClicked: {
             var searchText = room_srch.text;
             var searchResult = db_mng.searchRooms(searchText);
-            updateTableData(searchResult);
+            loadData(searchResult);
         }
     }
     FluFilledButton {
-        id: btn_add
+        id: add_btn
         anchors {
             right: parent.right
             top: parent.top
@@ -119,7 +119,7 @@ FluContentPage {
         }
         text: "添加"
         onClicked: {
-            roomAddPageRegister.launch();
+            add_win_register.launch();
         }
     }
 
@@ -129,7 +129,7 @@ FluContentPage {
         anchors {
             left: parent.left
             right: parent.right
-            top: btn_add.bottom
+            top: add_btn.bottom
             bottom: parent.bottom
         }
 
@@ -175,14 +175,7 @@ FluContentPage {
         Component.onCompleted: {
         }
     }
-    function load_data() {
-        var dataSource = db_mng.get_tbl_data("MeetingRooms");
-        for (var i = 0; i < dataSource.length; ++i) {
-            dataSource[i].operation = tbl_view.customItem(operation);
-        }
-        tbl_view.dataSource = dataSource;
-    }
-    function updateTableData(data) {
+    function loadData(data) {
         for (var i = 0; i < data.length; ++i) {
             data[i].operation = tbl_view.customItem(operation);
         }

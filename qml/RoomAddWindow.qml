@@ -123,7 +123,6 @@ FluWindow {
             height: 80 // 固定高度，可根据需求调整
             sourceSize.width: parent.width // 限制加载的图像宽度
             sourceSize.height: 80
-            // visible: imagePreview.status === Image.Ready
         }
         FluFilledButton {
             text: "保存"
@@ -148,12 +147,8 @@ FluWindow {
                     room_add.close()
                 } else {
                     showError("数据保存失败")
-                    // 显示错误信息或进行其他操作
                 }
             }
         }
-    }
-    onClosing: {
-        //TODO释放资源
     }
 }

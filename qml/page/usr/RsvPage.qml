@@ -9,9 +9,9 @@ FluContentPage {
     property var time_range: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
     Component.onCompleted: {
     }
-    property var rsvPageRegister: registerForWindowResult("/rsv")
+    property var rsv_win_register: registerForWindowResult("/rsv")
     Connections {
-        target: rsvPageRegister
+        target: rsv_win_register
         function onResult(result) {
             showSuccess(result.msg);
             tbl_view.dataSource = [];
@@ -30,7 +30,6 @@ FluContentPage {
 
         FluDatePicker {
             id: date_picker
-            // showYear: false
         }
         FluText {
             text: "选择开始和结束时间"
@@ -82,8 +81,8 @@ FluContentPage {
                 var selectedStartTime = start_time.currentText;
                 var selectedEndTime = end_time.currentText;
                 var selectedDate = date_picker.current;
-                var filteredRooms = db_mng.filterMeetingRooms(capacity, selectedDate, selectedStartTime, selectedEndTime);
-                load_data(filteredRooms);
+                var filteredRooms = db_mng.filterRooms(capacity, selectedDate, selectedStartTime, selectedEndTime);
+                loadData(filteredRooms);
             }
         }
     }
@@ -116,12 +115,12 @@ FluContentPage {
                         var reservation = {
                             roomID: obj.RoomID,
                             attendance: parseInt(attendance_box.text),
-                            date: date_picker.current.toLocaleDateString(Qt.locale("en-US"), "yyyy-MM-dd"),
+                            date: date_picker.current.toLocaleDateString(Qt.locale("zh-CN"), "yyyy-MM-dd"),
                             startTime: start_time.currentText,
                             endTime: end_time.currentText,
                             userID: argument.UsrInfo.UserID
                         };
-                        rsvPageRegister.launch({rsvData:reservation})
+                        rsv_win_register.launch({rsvData:reservation})
                     }
                 }
             }
@@ -176,7 +175,7 @@ FluContentPage {
                 editDelegate: edit_box
             }]
     }
-    function load_data(data) {
+    function loadData(data) {
         for (var i = 0; i < data.length; ++i) {
             data[i].operation = tbl_view.customItem(operation);
         }

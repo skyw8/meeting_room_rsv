@@ -54,7 +54,7 @@ FluWindow {
             text: "提交"
             Layout.alignment: Qt.AlignHCenter
             onClicked: {
-                var result = db_mng.rejectReservation(argument.logData.reservationID, argument.logData.approverID, reject_reason.text);
+                var result = db_mng.rejectRsv(argument.logData.reservationID, argument.logData.approverID, reject_reason.text);
                 if(result)
                 {
                     showError("操作成功")

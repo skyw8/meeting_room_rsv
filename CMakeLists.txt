@@ -12,10 +12,7 @@ set(source_files
     src/SettingsHelper.cpp
     src/SettingsHelper.h
     src/singleton.h
-    src/AppInfo.cpp
-    src/AppInfo.h
     src/stdafx.h
-    src/Version.h
     src/CircularReveal.cpp
     src/CircularReveal.h
     src/DatabaseManager.cpp

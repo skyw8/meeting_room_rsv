@@ -57,22 +57,22 @@ FluWindow {
                 visible: photo.status === Image.Ready // 图像加载完成后显示
             }
 
-            Text {
+            FluText {
                 text: "<b>房号:</b> " + argument.roomData.RoomID
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
+            FluText {
                 text: "<b>名称:</b> " + argument.roomData.RoomName
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
+            FluText {
                 text: "<b>人数容量:</b> " + argument.roomData.Capacity
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-            Text {
+            FluText {
                 text: "<b>面积:</b> " + argument.roomData.RoomArea
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
@@ -82,11 +82,7 @@ FluWindow {
                 //TODO自动换行问题
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
-                // width: parent.width
             }
         }
-    }
-    onClosing: {
-        //TODO释放资源
     }
 }

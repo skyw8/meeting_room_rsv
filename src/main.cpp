@@ -10,7 +10,6 @@
 #include <QDebug>
 #include <QSqlTableModel>
 #include "SettingsHelper.h"
-#include "AppInfo.h"
 #include "CircularReveal.h"
 #include "DatabaseManager.h"
 
@@ -29,12 +28,9 @@ int main(int argc, char *argv[])
     DatabaseManager db_mng;
 
     SettingsHelper::getInstance()->init(argv);
-    AppInfo::getInstance()->init(&engine);
 
     qmlRegisterType<CircularReveal>("meeting_room_rsv", 1, 0, "CircularReveal");
-    // qmlRegisterType<FluRegister>("meeting_room_rsv", 1, 0, "FluRegister");
     engine.rootContext()->setContextProperty("SettingsHelper",SettingsHelper::getInstance());
-    engine.rootContext()->setContextProperty("AppInfo",AppInfo::getInstance());
     engine.rootContext()->setContextProperty("db_mng",&db_mng);
 
     qDebug()<<engine.importPathList();

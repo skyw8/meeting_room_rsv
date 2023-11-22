@@ -7,9 +7,9 @@ import meeting_room_rsv
 FluContentPage {
     id: root_page
     title: "会议室情况"
-    property int currentRowIndex: -1
+    property int current_idx: -1
     Component.onCompleted: {
-        load_data();
+        loadData(db_mng.getRooms())
     }
 
     Component {
@@ -21,8 +21,8 @@ FluContentPage {
                     id: btn_detail
                     text: "详情"
                     onClicked: {
-                        currentRowIndex = row;
-                        var obj = tbl_view.dataSource[currentRowIndex]
+                        current_idx = row;
+                        var obj = tbl_view.dataSource[current_idx]
                         FluApp.navigate("/room_detail", {roomData: obj});
                     }
                 }
@@ -54,7 +54,7 @@ FluContentPage {
         onClicked: {
             var searchText = room_srch.text;
             var searchResult = db_mng.searchRooms(searchText);
-            updateTableData(searchResult);
+            loadData(searchResult);
         }
     }
 
@@ -110,14 +110,7 @@ FluContentPage {
         Component.onCompleted: {
         }
     }
-    function load_data() {
-        var dataSource = db_mng.get_tbl_data("MeetingRooms");
-        for (var i = 0; i < dataSource.length; ++i) {
-            dataSource[i].operation = tbl_view.customItem(operation);
-        }
-        tbl_view.dataSource = dataSource;
-    }
-    function updateTableData(data) {
+    function loadData(data) {
         for (var i = 0; i < data.length; ++i) {
             data[i].operation = tbl_view.customItem(operation);
         }
