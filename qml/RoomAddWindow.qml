@@ -142,7 +142,6 @@ FluWindow {
                 // 添加到数据库
                 var success = db_mng.addRoom(roomID, roomName, capacity, roomArea, description, photoPath);
                 if (success) {
-                    showSuccess("数据保存成功")
                     onResult({msg:"添加保存成功"})
                     room_add.close()
                 } else {

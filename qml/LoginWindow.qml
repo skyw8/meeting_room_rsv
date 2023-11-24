@@ -15,6 +15,13 @@ FluWindow {
     launchMode: FluWindowType.SingleTask
     appBar: undefined
     property var result
+    property var set_win_register: registerForWindowResult("/db_set")
+    Connections {
+        target: set_win_register
+        function onResult(result) {
+            showSuccess(result.msg)
+        }
+    }
     FluAppBar {
         id: app_bar_login
         title: "登录"
@@ -95,6 +102,10 @@ FluWindow {
                 id: login_btn
                 text: "登录"
                 onClicked: {
+                    if(db_mng.isDbOpen()===false){
+                        showError("数据库未连接");
+                        return;
+                    }
                     login.result = db_mng.auth(accountInput.text.toString(), passwordInput.text);
                     if (!result.isValid) {
                         showError("请输入正确的账号和密码");
@@ -104,6 +115,16 @@ FluWindow {
                     }
                 }
             }
+        }
+    }
+    FluIconButton {
+        iconSource: FluentIcons.Settings
+        anchors {
+            left: parent.left
+            bottom: parent.bottom
+        }
+        onClicked: {
+            set_win_register.launch()
         }
     }
 }

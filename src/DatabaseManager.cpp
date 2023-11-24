@@ -1,14 +1,15 @@
 
 #include "DatabaseManager.h"
-
+#include "SettingsHelper.h"
 DatabaseManager::DatabaseManager(QObject *parent) : QObject(parent)
 {
     // 设置数据库连接参数
+    SettingsHelper *sh=SettingsHelper::getInstance();
     db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost");
-    db.setDatabaseName("meeting_room_rsv");
-    db.setUserName("root");
-    db.setPassword("1234");
+    db.setHostName(sh->getHostName().toString());
+    db.setDatabaseName(sh->getDbName().toString());
+    db.setUserName(sh->getUserName().toString());
+    db.setPassword(sh->getPassword().toString());
 
     if (!db.open())
     {
@@ -17,7 +18,46 @@ DatabaseManager::DatabaseManager(QObject *parent) : QObject(parent)
 
     qDebug() << "Database connection success";
 }
+bool DatabaseManager::setup(const QString &host,const QString &name,const QString &usr,const QString &pswd)
+{
+    db.setHostName(host);
+    db.setDatabaseName(name);
+    db.setUserName(usr);
+    db.setPassword(pswd);
+    SettingsHelper *sh=SettingsHelper::getInstance();
+    sh->saveHostName(host);
+    sh->saveDbName(name);
+    sh->saveUserName(usr);
+    sh->savePassword(pswd);
 
+    if (!db.open())
+    {
+        qDebug() << "Database connection error:" << db.lastError().text();
+        return false;
+    }
+
+    qDebug() << "Database connection success";
+    return true;
+}
+QVariantMap DatabaseManager::getDbInfo() const {
+    QVariantMap info;
+    if (db.isValid()) {
+        info["Driver"] = db.driverName();
+        info["hostName"] = db.hostName();
+        info["databaseName"] = db.databaseName();
+        info["userName"] = db.userName();
+        info["password"] = db.password();
+        info["port"] = db.port();
+        info["connected"] = db.isOpen();
+    } else {
+        info["Error"] = "Database is not valid";
+    }
+    return info;
+}
+bool DatabaseManager::isDbOpen()const
+{
+    return db.isOpen();
+}
 QVariantMap DatabaseManager::auth(const QString &account, const QString &password)
 {
     QVariantMap userInfo;

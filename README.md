@@ -78,4 +78,13 @@ CREATE TABLE ApprovalLogs (
     FOREIGN KEY (ReservationID) REFERENCES Reservations(ReservationID),
     FOREIGN KEY (ApproverID) REFERENCES Users(UserID)
 );
+
+INSERT INTO Users VALUES(1,"1","1","1","admin");
+INSERT INTO Users VALUES(2,"2","2","2","user");
 ```
+
+
+
+## Reference
+
+[FluentUI](https://github.com/zhuzichu520/FluentUI)

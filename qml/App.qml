@@ -37,6 +37,7 @@ Item {
             "/room_edit":"qrc:meeting_room_rsv/qml/RoomEditWindow.qml",
             "/rsv":"qrc:meeting_room_rsv/qml/RsvWindow.qml",
             "/reject":"qrc:meeting_room_rsv/qml/RejectWindow.qml",
+            "/db_set":"qrc:meeting_room_rsv/qml/DbSetWindow.qml",
         }
         FluApp.initialRoute = "/login"
         FluApp.run()

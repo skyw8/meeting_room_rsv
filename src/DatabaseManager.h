@@ -20,6 +20,9 @@ class DatabaseManager : public QObject
 
 public:
     explicit DatabaseManager(QObject *parent = nullptr);
+    Q_INVOKABLE bool setup(const QString &host,const QString &name,const QString &usr,const QString &pswd);
+    Q_INVOKABLE QVariantMap getDbInfo() const;
+    Q_INVOKABLE bool isDbOpen()const;
     Q_INVOKABLE QVariantMap auth(const QString &account, const QString &password);
     Q_INVOKABLE QList<QVariantMap> getRooms();
     Q_INVOKABLE bool delRoom(const QString &roomId);
@@ -36,7 +39,6 @@ public:
     Q_INVOKABLE bool rejectRsv(const QString &reservationID, const QString &approverID, const QString &rejectionReason);
     Q_INVOKABLE QList<QVariantMap> filterRooms(int capacity, const QDate &date, const QString &startTimeText, const QString &endTimeText);
     Q_INVOKABLE bool addRsv(const QString &userID, const QString &roomID, const QString &dateStr, const QString &startTimeStr, const QString &endTimeStr, int attendance, const QString &meetingTheme);
-
 private:
     QSqlDatabase db;
 };

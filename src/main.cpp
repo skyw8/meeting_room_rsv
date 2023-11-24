@@ -25,10 +25,9 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
-    DatabaseManager db_mng;
-
+    //必须在创建DatabaseManager前
     SettingsHelper::getInstance()->init(argv);
-
+    DatabaseManager db_mng;
     qmlRegisterType<CircularReveal>("meeting_room_rsv", 1, 0, "CircularReveal");
     engine.rootContext()->setContextProperty("SettingsHelper",SettingsHelper::getInstance());
     engine.rootContext()->setContextProperty("db_mng",&db_mng);

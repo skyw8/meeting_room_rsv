@@ -13,6 +13,7 @@ FluContentPage {
     Connections {
         target: rsv_win_register
         function onResult(result) {
+            //TODO 没有提示
             showSuccess(result.msg);
             tbl_view.dataSource = [];
         }
@@ -120,7 +121,9 @@ FluContentPage {
                             endTime: end_time.currentText,
                             userID: argument.UsrInfo.UserID
                         };
-                        rsv_win_register.launch({rsvData:reservation})
+                        rsv_win_register.launch({
+                                rsvData: reservation
+                            });
                     }
                 }
             }
