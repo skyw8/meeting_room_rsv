@@ -24,7 +24,7 @@ FluWindow {
     SystemTrayIcon {
         id:system_tray
         visible: true
-        icon.source: "qrc:meeting_room_rsv/res/rsv.png"
+        icon.source: "qrc:meeting_room_rsv/res/rsv.ico"
         tooltip: "会议室预约系统"
         menu: Menu {
             MenuItem {
@@ -164,7 +164,7 @@ FluWindow {
         items: admin_items
         footerItems: footer_items
         topPadding: FluTools.isMacos() ? 20 : 0
-        logo: "qrc:meeting_room_rsv/res/rsv.png"
+        logo: "qrc:meeting_room_rsv/res/rsv.ico"
         title: "会议室预约系统"
         Component.onCompleted: {
             admin_items.navigationView = nav_view

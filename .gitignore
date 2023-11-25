@@ -10,4 +10,5 @@
 
 # 允许跟踪的文件
 !/CMakeLists.txt
+!/icon.rc
 !/README.md

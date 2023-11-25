@@ -5,8 +5,9 @@
 ## Get Started
 
 ```shell
-git clone --recursive https://github.com/zhuzichu520/FluentUI.git
 git clone https://github.com/SkywalkerZoZ/meeting_room_rsv.git
+cd meeting_room_rsv
+git clone --recursive https://github.com/zhuzichu520/FluentUI.git
 ```
 
 
@@ -18,6 +19,8 @@ git clone https://github.com/SkywalkerZoZ/meeting_room_rsv.git
 **MSVC2019-64bit**
 
 QtCreator or VS
+
+**mysql driver**
 
 
 

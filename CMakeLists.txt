@@ -22,6 +22,7 @@ qt_standard_project_setup()
 
 qt_add_executable(meeting_room_rsv
     ${source_files}
+    icon.rc
 )
 
 
