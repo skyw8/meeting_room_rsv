@@ -113,17 +113,38 @@ QList<QVariantMap> DatabaseManager::getRooms()
 
 bool DatabaseManager::delRoom(const QString &roomId)
 {
-    QSqlQuery query(db);
-    query.prepare("DELETE FROM MeetingRooms WHERE RoomID = :roomId");
-    query.bindValue(":roomId", roomId);
+    // 首先检查是否有未来的预约
+    QSqlQuery checkQuery(db);
+    checkQuery.prepare("SELECT COUNT(*) FROM Reservations "
+                       "WHERE RoomID = :roomId AND ReservationDate >= CURRENT_DATE()");
+    checkQuery.bindValue(":roomId", roomId);
 
-    if (!query.exec()) {
-        qDebug() << "Delete failed:" << query.lastError().text();
+    if (!checkQuery.exec()) {
+        qDebug() << "Check for future reservations failed:" << checkQuery.lastError().text();
+        return false;
+    }
+
+    if (checkQuery.next()) {
+        int count = checkQuery.value(0).toInt();
+        if (count > 0) {
+            qDebug() << "Cannot delete room:" << roomId << "as it has future reservations.";
+            return false; // 存在未来的预约，阻止删除操作
+        }
+    }
+
+    // 没有未来的预约，可以安全删除会议室
+    QSqlQuery deleteQuery(db);
+    deleteQuery.prepare("DELETE FROM MeetingRooms WHERE RoomID = :roomId");
+    deleteQuery.bindValue(":roomId", roomId);
+
+    if (!deleteQuery.exec()) {
+        qDebug() << "Delete failed:" << deleteQuery.lastError().text();
         return false;
     }
 
     return true;
 }
+
 
 QString DatabaseManager::getRoomPhoto(const QString &roomId)
 {

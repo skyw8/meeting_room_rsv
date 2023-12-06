@@ -47,15 +47,11 @@ CREATE TABLE MeetingRooms (
     Photo LONGBLOB
 );
 
-CREATE TABLE MeetingRoomSchedules (
-    ScheduleID VARCHAR(25) PRIMARY KEY,
-    RoomID VARCHAR(25),
-    ScheduleDate DATE,
-    StartTime TIME,
-    LastTime TIME,
-    Reserved BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY(RoomID) REFERENCES MeetingRooms(RoomID)
-);
+ALTER TABLE MeetingRooms
+ADD CONSTRAINT CapacityCheck CHECK (Capacity > 0);
+
+ALTER TABLE MeetingRooms
+ADD CONSTRAINT RoomAreaCheck CHECK (RoomArea > 0);
 
 
 CREATE TABLE Reservations (
@@ -71,6 +67,9 @@ CREATE TABLE Reservations (
     FOREIGN KEY (UserID) REFERENCES Users(UserID),
     FOREIGN KEY (RoomID) REFERENCES MeetingRooms(RoomID)
 );
+
+ALTER TABLE Reservations
+ADD CONSTRAINT AttendanceCheck CHECK (Attendance > 0);
 
 
 CREATE TABLE ApprovalLogs (

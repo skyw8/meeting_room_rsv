@@ -16,36 +16,32 @@ FluWindow {
     maximumHeight: 300
     fixSize: true
     launchMode: FluWindowType.SingleTask
-    appBar: undefined
-    Component.onCompleted: {
-        // var info=db_mng.getDbInfo()
-        ip_input.text=SettingsHelper.getHostName()
-        name_input.text=SettingsHelper.getDbName()
-        usr_input.text=SettingsHelper.getUserName()
-        pswd_input.text=SettingsHelper.getPassword()
-    }
-    FluAppBar {
+    appBar: FluAppBar {
         id: app_bar
+        width: db_set.width
+        height: 30
         title: "设置"
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
         showMinimize: false
         showMaximize: false
         showDark: false
         showStayTop: false
         z: 7
     }
+    Component.onCompleted: {
+        // var info=db_mng.getDbInfo()
+        ip_input.text = SettingsHelper.getHostName();
+        name_input.text = SettingsHelper.getDbName();
+        usr_input.text = SettingsHelper.getUserName();
+        pswd_input.text = SettingsHelper.getPassword();
+    }
     ColumnLayout {
         anchors {
             fill: parent
             centerIn: parent
-            topMargin:20
+            topMargin: 20
         }
         spacing: 3
-        
+
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             FluText {
@@ -96,14 +92,15 @@ FluWindow {
         FluFilledButton {
             text: "保存"
             Layout.alignment: Qt.AlignHCenter
-            onClicked:
-            {
-                var success=db_mng.setup(ip_input.text, name_input.text, usr_input.text, pswd_input.text)
+            onClicked: {
+                var success = db_mng.setup(ip_input.text, name_input.text, usr_input.text, pswd_input.text);
                 if (success) {
-                    onResult({msg:"数据库已连接"})
-                    db_set.close()
+                    onResult({
+                            msg: "数据库已连接"
+                        });
+                    db_set.close();
                 } else {
-                    showError("数据库连接失败")
+                    showError("数据库连接失败");
                 }
             }
         }

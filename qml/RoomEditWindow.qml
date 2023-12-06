@@ -10,28 +10,19 @@ FluWindow {
     title: "编辑"
     width: 400
     height: 600
-    minimumWidth: 400
-    maximumWidth: 400
-    minimumHeight: 600
-    maximumHeight: 600
-    fixSize: true
     launchMode: FluWindowType.SingleTask
-    appBar: undefined
-    property bool photoChanged: false
-    Component.onCompleted: {
-    }
-    FluAppBar {
+    appBar: FluAppBar {
         id: app_bar
         title: "编辑"
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
+        width: room_edit.width
+        height: 30
         showMinimize: false
         showMaximize: false
         showDark: false
         z: 7
+    }
+    property bool photoChanged: false
+    Component.onCompleted: {
     }
     ColumnLayout {
         anchors {

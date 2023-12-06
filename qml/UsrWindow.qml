@@ -6,9 +6,6 @@ import Qt.labs.platform
 import FluentUI
 import meeting_room_rsv
 
-
-
-
 FluWindow {
 
     id:window
@@ -18,7 +15,15 @@ FluWindow {
     minimumWidth: 520
     minimumHeight: 200
     launchMode: FluWindowType.SingleTask
-    appBar: undefined
+    appBar: FluAppBar {
+        id:app_bar
+        showDark: true
+        width: window.width
+        height: 30
+        darkClickListener:(button)=>handleDarkChanged(button)
+        closeClickListener: ()=>{dialog_close.open()}
+        z:7
+    }
     Component.onCompleted:{
     }
 
@@ -76,21 +81,6 @@ FluWindow {
             }
         }
     }
-
-
-    FluAppBar {
-        id:app_bar
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
-        showDark: true
-        darkClickListener:(button)=>handleDarkChanged(button)
-        closeClickListener: ()=>{dialog_close.open()}
-        z:7
-    }
-
     FluObject{
 
         property var navigationView

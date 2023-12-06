@@ -10,27 +10,18 @@ FluWindow {
     title: "预约"
     width: 400
     height: 600
-    minimumWidth: 400
-    maximumWidth: 400
-    minimumHeight: 600
-    maximumHeight: 600
-    fixSize: true
     launchMode: FluWindowType.SingleTask
-    appBar: undefined
-    Component.onCompleted: {
-    }
-    FluAppBar {
+    appBar: FluAppBar {
         id: app_bar
         title: "预约"
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
+        width: room_add.width
+        height: 30
         showMinimize: false
         showMaximize: false
         showDark: false
         z: 7
+    }
+    Component.onCompleted: {
     }
     ColumnLayout {
         anchors {

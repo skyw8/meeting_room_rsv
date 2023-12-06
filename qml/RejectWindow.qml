@@ -9,33 +9,25 @@ FluWindow {
     id: reject
     width: 350
     height: 350
-    minimumWidth: 350
-    maximumWidth: 350
-    minimumHeight: 350
-    maximumHeight: 350
-    fixSize: true
     launchMode: FluWindowType.SingleTask
-    appBar: undefined
-    Component.onCompleted: {
-    }
-    FluAppBar {
+    appBar: FluAppBar {
         id: app_bar
-        title: "详情"
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
+        title: "驳回"
+        width: reject.width
+        height: 30
         showMinimize: false
         showMaximize: false
         showDark: false
         z: 7
+    }
+    Component.onCompleted: {
     }
     ColumnLayout {
         anchors {
             fill: parent
             centerIn: parent
             topMargin: 20
+            bottomMargin: 10
         }
         FluText {
             text: "驳回原因"
@@ -45,9 +37,9 @@ FluWindow {
         FluMultilineTextBox {
             id: reject_reason
             placeholderText: "请输入驳回原因"
-            Layout.preferredHeight: 100
+            Layout.preferredHeight: 180
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 200
+            Layout.preferredWidth: 300
         }
         FluFilledButton {
             id: reject_btn

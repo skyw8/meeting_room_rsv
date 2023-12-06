@@ -9,33 +9,25 @@ FluWindow {
     title: "详情"
     width: 400
     height: 500
-    minimumWidth: 400
-    maximumWidth: 400
-    minimumHeight: 500
-    maximumHeight: 500
     fixSize: true
     launchMode: FluWindowType.SingleTask
-    appBar: undefined
-    property var aprvl_detail: db_mng.getLogs(argument.rsvData.ReservationID)
-    Component.onCompleted: {
-    }
-    FluAppBar {
+    appBar: FluAppBar {
         id: app_bar
         title: "详情"
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
+        width: rsv_detail.width
+        height: 30
         showMinimize: false
         showMaximize: false
         showDark: false
         z: 7
     }
+    property var aprvl_detail: db_mng.getLogs(argument.rsvData.ReservationID)
+    Component.onCompleted: {
+    }
 
     Flickable {
         anchors {
-            top: app_bar.bottom
+            top: parent.top
             bottom: parent.bottom
             left: parent.left
             right: parent.right

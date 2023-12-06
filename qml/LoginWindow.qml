@@ -13,7 +13,21 @@ FluWindow {
     minimumWidth: 400
     minimumHeight: 300
     launchMode: FluWindowType.SingleTask
-    appBar: undefined
+    appBar: FluAppBar {
+        id: app_bar_login
+        title: "登录"
+        width: login.width
+        height: 30
+        showMinimize: false
+        showMaximize: false
+        showStayTop: false
+        showDark: false
+        darkClickListener: button => handleDarkChanged(button)
+        closeClickListener: () => {
+            FluApp.exit(0);
+        }
+        z: 7
+    }
     property var result
     property var set_win_register: registerForWindowResult("/db_set")
     Connections {
@@ -21,24 +35,6 @@ FluWindow {
         function onResult(result) {
             showSuccess(result.msg)
         }
-    }
-    FluAppBar {
-        id: app_bar_login
-        title: "登录"
-        showMinimize: false
-        showMaximize: false
-        showStayTop: false
-        showDark: false
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
-        darkClickListener: button => handleDarkChanged(button)
-        closeClickListener: () => {
-            FluApp.exit(0);
-        }
-        z: 7
     }
 
     Timer {
