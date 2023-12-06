@@ -88,11 +88,12 @@ QVariantMap DatabaseManager::auth(const QString &account, const QString &passwor
 
 
 
-QList<QVariantMap> DatabaseManager::getRooms()
-{
+QList<QVariantMap> DatabaseManager::getRooms() {
     QList<QVariantMap> dataList;
     QSqlQuery query(db);
-    if (query.exec(QString("SELECT * FROM MeetingRooms"))) {
+
+    // 修改SQL查询，排除Photo字段
+    if (query.exec("SELECT RoomID, RoomName, Capacity, RoomArea, Description FROM MeetingRooms")) {
         QSqlRecord record = query.record();
         
         while (query.next()) {
@@ -110,6 +111,7 @@ QList<QVariantMap> DatabaseManager::getRooms()
 
     return dataList;
 }
+
 
 bool DatabaseManager::delRoom(const QString &roomId)
 {
@@ -264,7 +266,8 @@ QList<QVariantMap> DatabaseManager::searchRooms(const QString &searchText) {
     QList<QVariantMap> dataList;
 
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM MeetingRooms WHERE RoomID LIKE :searchText OR RoomName LIKE :searchText");
+    // 从查询中排除Photo字段
+    query.prepare("SELECT RoomID, RoomName, Capacity, RoomArea, Description FROM MeetingRooms WHERE RoomID LIKE :searchText OR RoomName LIKE :searchText");
     query.bindValue(":searchText", "%" + searchText + "%");
 
     if (query.exec()) {
@@ -282,6 +285,7 @@ QList<QVariantMap> DatabaseManager::searchRooms(const QString &searchText) {
 
     return dataList;
 }
+
 QString DatabaseManager::getRsvDate(const QString &reservationID)
 {
     QSqlQuery query(db);
@@ -468,7 +472,8 @@ QList<QVariantMap> DatabaseManager::filterRooms(int capacity, const QDate &date,
     const QTime endTime = QTime::fromString(endTimeText + ":00:00", "HH:mm:ss");
     QList<QVariantMap> availableRooms;
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM MeetingRooms WHERE Capacity >= :capacity AND RoomID NOT IN "
+    // 从查询中排除Photo字段
+    query.prepare("SELECT RoomID, RoomName, Capacity, RoomArea, Description FROM MeetingRooms WHERE Capacity >= :capacity AND RoomID NOT IN "
                   "(SELECT RoomID FROM Reservations WHERE ReservationDate = :date AND "
                   "ReservationStatus = 'agree' AND"
                   "((StartTime <= :startTime AND EndTime > :startTime) OR "
