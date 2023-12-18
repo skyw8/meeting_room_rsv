@@ -4,11 +4,19 @@
 
 ## Get Started
 
+use FluentUI in this repo
 ```shell
 git clone https://github.com/SkywalkerZoZ/meeting_room_rsv.git
+
 ```
 
-
+or
+```shell
+git clone https://github.com/SkywalkerZoZ/meeting_room_rsv.git
+cd meeting_room_rsv
+rm -r FluentUI
+git clone --branch 1.6.4-framelesshelper --recursive https://github.com/zhuzichu520/FluentUI.git
+```
 
 ## Build
 

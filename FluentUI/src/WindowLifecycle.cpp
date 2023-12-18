@@ -2,6 +2,7 @@
 
 #include "FluApp.h"
 #include "FluRegister.h"
+#include <QGuiApplication>
 
 WindowLifecycle::WindowLifecycle(QObject *parent):QObject{parent}{
 }

@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 
 if (FLUENTUI_BUILD_STATIC_LIB AND (QT_VERSION VERSION_GREATER_EQUAL "6.2"))
-    project(fluentui LANGUAGES CXX)
+    project(fluentui VERSION 1.0)
 else()
-    project(fluentuiplugin LANGUAGES CXX)
+    project(fluentuiplugin VERSION 1.0)
 endif()
 
 #配置通用编译

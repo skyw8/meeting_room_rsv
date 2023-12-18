@@ -7,6 +7,7 @@
 #include <QJsonValue>
 #include <QJSValue>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include "Def.h"
 #include "stdafx.h"
 #include "singleton.h"
@@ -67,11 +68,13 @@ public:
     Q_INVOKABLE NetworkParams* setCacheMode(int val);
     Q_INVOKABLE NetworkParams* toDownload(QString destPath,bool append = false);
     Q_INVOKABLE NetworkParams* bind(QObject* target);
+    Q_INVOKABLE NetworkParams* openLog(QVariant val);
     Q_INVOKABLE void go(NetworkCallable* result);
     QString buildCacheKey();
     QString method2String();
     int getTimeout();
     int getRetry();
+    bool getOpenLog();
 public:
     DownloadParam* _downloadParam = nullptr;
     QObject* _target = nullptr;
@@ -85,6 +88,7 @@ public:
     QMap<QString, QVariant> _fileMap;
     int _timeout = -1;
     int _retry = -1;
+    QVariant _openLog;
     int _cacheMode = FluNetworkType::CacheMode::NoCache;
 };
 
@@ -94,6 +98,7 @@ class FluNetwork : public QObject
     Q_PROPERTY_AUTO(int,timeout)
     Q_PROPERTY_AUTO(int,retry)
     Q_PROPERTY_AUTO(QString,cacheDir)
+    Q_PROPERTY_AUTO(bool,openLog)
     QML_NAMED_ELEMENT(FluNetwork)
     QML_SINGLETON
 private:
@@ -123,13 +128,17 @@ public:
     void handle(NetworkParams* params,NetworkCallable* result);
     void handleDownload(NetworkParams* params,NetworkCallable* result);
 private:
-    void sendRequest(QNetworkAccessManager* manager,QNetworkRequest request,NetworkParams* params,QNetworkReply*& reply,QPointer<NetworkCallable> callable);
+    void sendRequest(QNetworkAccessManager* manager,QNetworkRequest request,NetworkParams* params,QNetworkReply*& reply,bool isFirst,QPointer<NetworkCallable> callable);
     void addQueryParam(QUrl* url,const QMap<QString, QVariant>& params);
     void addHeaders(QNetworkRequest* request,const QMap<QString, QVariant>& headers);
     void saveResponse(QString key,QString response);
     QString readCache(const QString& key);
     bool cacheExists(const QString& key);
     QString getCacheFilePath(const QString& key);
+    QString map2String(const QMap<QString, QVariant>& map);
+    QString headerList2String(const QList<QNetworkReply::RawHeaderPair>& data);
+    void printRequestStartLog(QNetworkRequest request,NetworkParams* params);
+    void printRequestEndLog(QNetworkRequest request,NetworkParams* params,QNetworkReply*& reply,const QString& response);
 public:
     QJSValue _interceptor;
 };

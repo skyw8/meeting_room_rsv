@@ -74,14 +74,16 @@ Rectangle{
         property bool isRestore: win && Window.Maximized === win.visibility
         property bool resizable: win && !(win.height === win.maximumHeight && win.height === win.minimumHeight && win.width === win.maximumWidth && win.width === win.minimumWidth)
     }
-    TapHandler {
-        onTapped: if (tapCount === 2 && d.resizable) btn_maximize.clicked()
-        gesturePolicy: TapHandler.DragThreshold
-    }
-    DragHandler {
-        target: null
-        grabPermissions: TapHandler.CanTakeOverFromAnything
-        onActiveChanged: if (active) { d.win.startSystemMove(); }
+    MouseArea{
+        anchors.fill: parent
+        onPositionChanged: {
+            d.win.startSystemMove()
+        }
+        onDoubleClicked: {
+            if (d.resizable){
+                btn_maximize.clicked()
+            }
+        }
     }
     Row{
         anchors{

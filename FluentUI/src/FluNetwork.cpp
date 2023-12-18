@@ -54,6 +54,13 @@ int NetworkParams::getRetry(){
     return FluNetwork::getInstance()->retry();
 }
 
+bool NetworkParams::getOpenLog(){
+    if(!_openLog.isNull()){
+        return _openLog.toBool();
+    }
+    return FluNetwork::getInstance()->openLog();
+}
+
 DownloadParam::DownloadParam(QObject *parent)
     : QObject{parent}
 {
@@ -129,6 +136,11 @@ NetworkParams* NetworkParams::bind(QObject* target){
     return this;
 }
 
+NetworkParams* NetworkParams::openLog(QVariant val){
+    _openLog = val;
+    return this;
+}
+
 QString NetworkParams::buildCacheKey(){
     QJsonObject obj;
     obj.insert("url",_url);
@@ -189,7 +201,7 @@ void FluNetwork::handle(NetworkParams* params,NetworkCallable* c){
             QNetworkRequest request(url);
             addHeaders(&request,params->_headerMap);
             QNetworkReply* reply;
-            sendRequest(&manager,request,params,reply,callable);
+            sendRequest(&manager,request,params,reply,i==0,callable);
             if(!QPointer(qApp)){
                 reply->deleteLater();
                 reply = nullptr;
@@ -215,22 +227,26 @@ void FluNetwork::handle(NetworkParams* params,NetworkCallable* c){
                 disconnect(conn_quit);
             }
             QString response;
-            if(reply->isOpen()){
-                response = QString::fromUtf8(reply->readAll());
+            if(params->_method == NetworkParams::METHOD_HEAD){
+                response = headerList2String(reply->rawHeaderPairs());
+            }else{
+                if(reply->isOpen()){
+                    response = QString::fromUtf8(reply->readAll());
+                }
             }
-            QNetworkReply::NetworkError error = reply->error();
-            if(error == QNetworkReply::NoError){
+            int httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+            if(httpStatus == 200){
                 if(!callable.isNull()){
                     if(params->_cacheMode != FluNetworkType::CacheMode::NoCache){
                         saveResponse(cacheKey,response);
                     }
                     callable->success(response);
                 }
+                printRequestEndLog(request,params,reply,response);
                 break;
             }else{
                 if(i == params->getRetry()-1){
                     if(!callable.isNull()){
-                        int httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
                         if(params->_cacheMode == FluNetworkType::CacheMode::RequestFailedReadCache && cacheExists(cacheKey)){
                             if(!callable.isNull()){
                                 callable->cache(readCache(cacheKey));
@@ -238,6 +254,7 @@ void FluNetwork::handle(NetworkParams* params,NetworkCallable* c){
                         }
                         callable->error(httpStatus,reply->errorString(),response);
                     }
+                    printRequestEndLog(request,params,reply,response);
                 }
             }
             reply->deleteLater();
@@ -387,40 +404,70 @@ QString FluNetwork::getCacheFilePath(const QString& key){
     return cacheDir.absoluteFilePath(key);
 }
 
-void FluNetwork::sendRequest(QNetworkAccessManager* manager,QNetworkRequest request,NetworkParams* params,QNetworkReply*& reply,QPointer<NetworkCallable> callable){
+QString FluNetwork::headerList2String(const QList<QNetworkReply::RawHeaderPair>& data){
+    QJsonObject object;
+    for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
+        object.insert(QString(it->first),QString(it->second));
+    }
+    return QJsonDocument(object).toJson(QJsonDocument::Compact);
+}
+
+QString FluNetwork::map2String(const QMap<QString, QVariant>& map){
+    QStringList parameters;
+    for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
+        parameters << QString("%1=%2").arg(it.key(), it.value().toString());
+    }
+    return parameters.join(" ");
+}
+
+void FluNetwork::sendRequest(QNetworkAccessManager* manager,QNetworkRequest request,NetworkParams* params,QNetworkReply*& reply,bool isFirst,QPointer<NetworkCallable> callable){
     QByteArray verb = params->method2String().toUtf8();
     switch (params->_type) {
     case NetworkParams::TYPE_FORM:{
-        QHttpMultiPart *multiPart = new QHttpMultiPart();
-        multiPart->setContentType(QHttpMultiPart::FormDataType);
-        for (const auto& each : params->_paramMap.toStdMap())
-        {
-            QHttpPart part;
-            part.setHeader(QNetworkRequest::ContentDispositionHeader, QString("form-data; name=\"%1\"").arg(each.first));
-            part.setBody(each.second.toByteArray());
-            multiPart->append(part);
-        }
-        for (const auto& each : params->_fileMap.toStdMap())
-        {
-            QString filePath = each.second.toString();
-            QString name = each.first;
-            QFile *file = new QFile(filePath);
-            QString fileName = QFileInfo(filePath).fileName();
-            file->open(QIODevice::ReadOnly);
-            file->setParent(multiPart);
-            QHttpPart part;
-            part.setHeader(QNetworkRequest::ContentDispositionHeader, QString("form-data; name=\"%1\"; filename=\"%2\"").arg(name,fileName));
-            part.setBodyDevice(file);
-            multiPart->append(part);
-        }
-        reply = manager->sendCustomRequest(request,verb,multiPart);
-        multiPart->setParent(reply);
-        if(!params->_fileMap.isEmpty()){
+        bool isFormData = !params->_fileMap.isEmpty();
+        if(isFormData){
+            QHttpMultiPart *multiPart = new QHttpMultiPart();
+            multiPart->setContentType(QHttpMultiPart::FormDataType);
+            for (const auto& each : params->_paramMap.toStdMap())
+            {
+                QHttpPart part;
+                part.setHeader(QNetworkRequest::ContentDispositionHeader, QString("form-data; name=\"%1\"").arg(each.first));
+                part.setBody(each.second.toByteArray());
+                multiPart->append(part);
+            }
+            for (const auto& each : params->_fileMap.toStdMap())
+            {
+                QString filePath = each.second.toString();
+                QString name = each.first;
+                QFile *file = new QFile(filePath);
+                QString fileName = QFileInfo(filePath).fileName();
+                file->open(QIODevice::ReadOnly);
+                file->setParent(multiPart);
+                QHttpPart part;
+                part.setHeader(QNetworkRequest::ContentDispositionHeader, QString("form-data; name=\"%1\"; filename=\"%2\"").arg(name,fileName));
+                part.setBodyDevice(file);
+                multiPart->append(part);
+            }
+            reply = manager->sendCustomRequest(request,verb,multiPart);
+            multiPart->setParent(reply);
             connect(reply,&QNetworkReply::uploadProgress,reply,[callable](qint64 bytesSent, qint64 bytesTotal){
                 if(!callable.isNull() && bytesSent!=0 && bytesTotal!=0){
-                    callable->uploadProgress(bytesSent,bytesTotal);
+                    Q_EMIT callable->uploadProgress(bytesSent,bytesTotal);
                 }
             });
+        }else{
+            request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded"));
+            QString value;
+            for (const auto& each : params->_paramMap.toStdMap())
+            {
+                value += QString("%1=%2").arg(each.first,each.second.toString());
+                value += "&";
+            }
+            if(!params->_paramMap.isEmpty()){
+                value.chop(1);
+            }
+            QByteArray data = value.toUtf8();
+            reply = manager->sendCustomRequest(request,verb,data);
         }
         break;
     }
@@ -458,6 +505,46 @@ void FluNetwork::sendRequest(QNetworkAccessManager* manager,QNetworkRequest requ
         reply = manager->sendCustomRequest(request,verb);
         break;
     }
+    if(isFirst){
+        printRequestStartLog(request,params);
+    }
+}
+
+void FluNetwork::printRequestStartLog(QNetworkRequest request,NetworkParams* params){
+    if(!params->getOpenLog()){
+        return;
+    }
+    qDebug()<<"<------"<<qUtf8Printable(request.header(QNetworkRequest::UserAgentHeader).toString())<<"Request Start ------>";
+    qDebug()<<qUtf8Printable(QString::fromStdString("<%1>").arg(params->method2String()))<<qUtf8Printable(params->_url);
+    auto contentType = request.header(QNetworkRequest::ContentTypeHeader).toString();
+    if(!contentType.isEmpty()){
+        qDebug()<<qUtf8Printable(QString::fromStdString("<Header> %1=%2").arg("Content-Type",contentType));
+    }
+    QList<QByteArray> headers = request.rawHeaderList();
+    for(const QByteArray& header:headers){
+        qDebug()<<qUtf8Printable(QString::fromStdString("<Header> %1=%2").arg(header,request.rawHeader(header)));
+    }
+    if(!params->_queryMap.isEmpty()){
+        qDebug()<<"<Query>"<<qUtf8Printable(map2String(params->_queryMap));
+    }
+    if(!params->_paramMap.isEmpty()){
+        qDebug()<<"<Param>"<<qUtf8Printable(map2String(params->_paramMap));
+    }
+    if(!params->_fileMap.isEmpty()){
+        qDebug()<<"<File>"<<qUtf8Printable(map2String(params->_fileMap));
+    }
+    if(!params->_body.isEmpty()){
+        qDebug()<<"<Body>"<<qUtf8Printable(params->_body);
+    }
+}
+
+void FluNetwork::printRequestEndLog(QNetworkRequest request,NetworkParams* params,QNetworkReply*& reply,const QString& response){
+    if(!params->getOpenLog()){
+        return;
+    }
+    qDebug()<<"<------"<<qUtf8Printable(request.header(QNetworkRequest::UserAgentHeader).toString())<<"Request End ------>";
+    qDebug()<<qUtf8Printable(QString::fromStdString("<%1>").arg(params->method2String()))<<qUtf8Printable(params->_url);
+    qDebug()<<"<Result>"<<qUtf8Printable(response);
 }
 
 void FluNetwork::saveResponse(QString key,QString response){
@@ -471,6 +558,7 @@ void FluNetwork::saveResponse(QString key,QString response){
 }
 
 void FluNetwork::addHeaders(QNetworkRequest* request,const QMap<QString, QVariant>& headers){
+    request->setHeader(QNetworkRequest::UserAgentHeader,QString::fromStdString("Mozilla/5.0 %1/%2").arg(QGuiApplication::applicationName(),QGuiApplication::applicationVersion()));
     QMapIterator<QString, QVariant> iter(headers);
     while (iter.hasNext())
     {
@@ -494,6 +582,7 @@ FluNetwork::FluNetwork(QObject *parent): QObject{parent}
 {
     timeout(5000);
     retry(3);
+    openLog(false);
     cacheDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation).append(QDir::separator()).append("network"));
 }
 
