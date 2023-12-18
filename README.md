@@ -5,7 +5,7 @@
 ## Get Started
 
 ```shell
-git clone --recursive https://github.com/SkywalkerZoZ/meeting_room_rsv.git
+git clone https://github.com/SkywalkerZoZ/meeting_room_rsv.git
 ```
 
 
