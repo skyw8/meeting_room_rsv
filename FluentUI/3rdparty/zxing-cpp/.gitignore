@@ -1,7 +1,0 @@
-CMakeLists.txt.user
-*.o
-*.so
-*.lib
-*.d
-*.a
-compile_commands.json
