@@ -2,7 +2,7 @@
 
 
 
-## Get Started
+## Getting Started
 
 ```shell
 git clone https://github.com/SkywalkerZoZ/meeting_room_rsv.git
@@ -12,7 +12,7 @@ git clone --branch 1.6.4-framelesshelper --recursive https://github.com/zhuzichu
 
 
 
-## Build
+## Environment
 
 **Qt 6.60**
 
